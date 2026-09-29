@@ -1,453 +1,573 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fluxo do Investidor - Radar Investimentos B3</title>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-  <style>
-    :root {
-      --bg: #F4F6F9;
-      --card-bg: #FFFFFF;
-      --border: #D0D7DE;
-      --text: #24292F;
-      --text-muted: #57606A;
-      --accent: #0969DA;
-      --green: #1A7F37;
-      --yellow: #9A6700;
-      --red: #CF222E;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-    }
-    .container {
-      max-width: 920px;
-      width: 100%;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 25px;
-      box-shadow: 0 8px 24px rgba(140, 149, 159, 0.2);
-    }
-    .header {
-      text-align: center;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 15px;
-      margin-bottom: 20px;
-    }
-    .header h1 {
-      font-size: 26px;
-      color: #0969DA;
-      margin-bottom: 4px;
-    }
-    .header p {
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-    .badge {
-      display: inline-block;
-      background: rgba(9, 105, 218, 0.1);
-      color: var(--accent);
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12.5px;
-      font-weight: 600;
-      margin-top: 8px;
-    }
-
-    /* Container Interativo de Zoom e Pan em Fundo Branco */
-    .zoom-wrapper {
-      position: relative;
-      background: #FFFFFF;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      margin: 20px 0;
-      overflow: hidden;
-      height: 640px;
-      box-shadow: inset 0 1px 6px rgba(0,0,0,0.05);
-    }
-
-    /* Barra de Ferramentas Flutuante */
-    .zoom-controls {
-      position: absolute;
-      top: 14px;
-      right: 14px;
-      display: flex;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(8px);
-      border: 1px solid var(--border);
-      padding: 6px;
-      border-radius: 8px;
-      z-index: 100;
-      align-items: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-    .zoom-btn {
-      background: #F6F8FA;
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-size: 14px;
-      font-weight: bold;
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s;
-    }
-    .zoom-btn:hover {
-      background: var(--accent);
-      color: #FFFFFF;
-      border-color: var(--accent);
-    }
-    .zoom-level {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      padding: 0 6px;
-      min-width: 48px;
-      text-align: center;
-    }
-    .zoom-tip {
-      position: absolute;
-      bottom: 12px;
-      left: 14px;
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid var(--border);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      color: var(--text-muted);
-      pointer-events: none;
-      z-index: 100;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-
-    /* Área que sofre o Pan & Zoom */
-    .viewport {
-      width: 100%;
-      height: 100%;
-      cursor: grab;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-    }
-    .viewport.grabbing {
-      cursor: grabbing;
-    }
-    .zoom-content {
-      transform-origin: center center;
-      transition: transform 0.05s ease-out;
-      display: inline-block;
-    }
-    .zoom-content svg {
-      max-width: none !important;
-      height: auto !important;
-    }
-
-    /* Cards explicativos em tema claro */
-    .steps-list {
-      margin-top: 25px;
-      display: grid;
-      gap: 14px;
-    }
-    .step-card {
-      background: #F6F8FA;
-      border: 1px solid var(--border);
-      border-left: 5px solid var(--accent);
-      border-radius: 8px;
-      padding: 14px 16px;
-    }
-    .step-card.green { border-left-color: var(--green); }
-    .step-card.yellow { border-left-color: var(--yellow); }
-    .step-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: #1F2328;
-      margin-bottom: 4px;
-    }
-    .step-desc {
-      font-size: 13.5px;
-      color: var(--text-muted);
-    }
-    .footer {
-      text-align: center;
-      margin-top: 25px;
-      padding-top: 15px;
-      border-top: 1px solid var(--border);
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-    .footer strong {
-      color: var(--accent);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Processo BPMN Vertical - Radar Investimentos B3</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #e2e8f0;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    color: #0f172a;
+  }
+  #app { max-width: 100%; padding: 18px; }
+  #card {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(15,23,42,0.15);
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+  }
+  #toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+    padding: 14px 20px;
+    background: #0f172a;
+  }
+  #toolbar h1 { margin: 0; color: #fff; font-size: 19px; font-weight: 700; }
+  #toolbar p { margin: 4px 0 0; color: #94a3b8; font-size: 12.5px; }
+  #controls { display: flex; align-items: center; gap: 16px; }
+  #controls label { display: flex; align-items: center; gap: 8px; color: #e2e8f0; font-size: 12.5px; }
+  #zoomVal { width: 36px; display: inline-block; color: #e2e8f0; font-weight: 600; }
+  #downloadBtn {
+    background: #2563eb; color: #fff; border: none; padding: 10px 18px;
+    border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 2px 6px rgba(37,99,235,0.4);
+    transition: background 0.2s;
+  }
+  #downloadBtn:hover { background: #1d4ed8; }
+  #scrollWrap { overflow: auto; max-height: 80vh; background: #ffffff; }
+  #diagramWrap { position: relative; display: inline-block; }
+  #stickyHeader {
+    position: sticky; top: 0; z-index: 30;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(15,23,42,0.06);
+  }
+  #headerSvg, #bpmnSvg { display: block; }
+  .node { cursor: help; }
+  #tooltip {
+    position: fixed; display: none; max-width: 320px;
+    background: #0f172a; color: #f8fafc;
+    padding: 12px 14px; border-radius: 10px;
+    font-size: 12.5px; line-height: 1.45;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+    z-index: 9999; pointer-events: none; border: 1px solid #334155;
+  }
+  #tooltip .tt-title { font-weight: 700; margin-bottom: 5px; color: #93c5fd; font-size: 13px; }
+  #hint {
+    padding: 12px 20px 16px; font-size: 12px; color: #64748b; background: #f8fafc;
+    line-height: 1.5; border-top: 1px solid #e2e8f0;
+  }
+  #hint b { color: #0f172a; }
+</style>
 </head>
 <body>
-
-  <div class="container">
-    <div class="header">
-      <h1>📈 Radar Investimentos B3</h1>
-      <p>Fluxo de Decisão do Investidor Inteligente (BPMN Vertical)</p>
-      <span class="badge">🔍 Use a rodinha do mouse para dar Zoom e Arraste para navegar no fluxo</span>
+<div id="app">
+  <div id="card">
+    <div id="toolbar">
+      <div>
+        <h1>📈 Processo de Investimento Inteligente - Radar Investimentos B3</h1>
+        <p>Fluxo ponta a ponta, de cima para baixo &middot; passe o mouse sobre cada elemento para ver a explica&ccedil;&atilde;o</p>
+      </div>
+      <div id="controls">
+        <label>Zoom
+          <input id="zoomRange" type="range" min="40" max="150" value="65">
+          <span id="zoomVal">65%</span>
+        </label>
+        <button id="downloadBtn">&#11015; Baixar PNG</button>
+      </div>
     </div>
-
-    <!-- Área de Visualização com Zoom e Pan no Fundo Branco -->
-    <div class="zoom-wrapper" id="zoomWrapper">
-      <div class="zoom-controls">
-        <button class="zoom-btn" id="btnZoomIn" title="Aumentar Zoom (ou use a rodinha do mouse)">➕</button>
-        <span class="zoom-level" id="zoomLevel">100%</span>
-        <button class="zoom-btn" id="btnZoomOut" title="Diminuir Zoom">➖</button>
-        <button class="zoom-btn" id="btnReset" title="Resetar Visualização">🔄</button>
-        <button class="zoom-btn" id="btnFit" title="Ajustar à Tela">↕️</button>
-      </div>
-
-      <div class="zoom-tip">
-        🖱️ <strong>Dica:</strong> Gire a <strong>rodinha do mouse</strong> para ampliar/reduzir • <strong>Clique e arraste</strong> para mover
-      </div>
-
-      <div class="viewport" id="viewport">
-        <div class="zoom-content" id="zoomContent">
-          <div class="mermaid">
-flowchart TD
-    Start(["🟢 Início: Dia do Aporte Mensal\n(Você tem dinheiro novo para investir)"])
-
-    subgraph Fase1 ["Fase 1: Triagem & Filtros (Radar de Oportunidades)"]
-        A1["1. Abrir o Dashboard e Atualizar Cotações"]
-        A2["2. Filtrar Setores Perenes (BEST)\n(Energia, Saneamento ou Bancos)"]
-        A3["3. Olhar os Pódios: Top Dividendos & Top Graham"]
-    end
-
-    subgraph Decisao1 ["Portão de Decisão: Preço & Proventos"]
-        G1{"A ação está ABAIXO\ndo Preço Teto Bazin\n(Preço atual <= Linha Verde)?"}
-    end
-
-    subgraph Fase2 ["Fase 2: Raio-X & Saúde da Empresa"]
-        B1["4. Abrir a aba 'Raio-X do Ativo'"]
-        B2["5. Validar Indicadores de Qualidade:\n• ROE >= 12% (empresa lucrativa)\n• P/L < 12x (preço acessível)\n• Margem Graham positiva"]
-        B3["6. Olhar o Gráfico Candlestick:\nO preço está longe da média amarela (euforia)?"]
-    end
-
-    subgraph Decisao2 ["Portão de Timing de Compra"]
-        G2{"O preço está esticado\nno curto prazo?"}
-    end
-
-    subgraph Fase3 ["Fase 3: Simulação & Execução"]
-        C1["7. Abrir a aba 'Simulador de Renda'\nDigitar o valor que você tem (ex: R$ 100, R$ 500)"]
-        C2["8. Ver o total de ações a comprar e\na renda anual/mensal projetada"]
-        C3["9. Abrir o aplicativo da sua Corretora\nComprar as ações no fracionário (ex: CMIG4F)"]
-    end
-
-    WaitStep["Aguardar alguns dias para o preço respirar\nou comprar uma parcela menor"]
-    DiscardStep["Pausar compras desta ação e\nescolher outra da lista abaixo do teto"]
-    EndNode(["🏁 Fim: Ações Compradas!\n(Dividendos pingando na conta para reinvestir)"])
-
-    Start --> A1
-    A1 --> A2
-    A2 --> A3
-    A3 --> G1
-
-    G1 -- "NÃO (Está Cara)" --> DiscardStep
-    DiscardStep --> A2
-
-    G1 -- "SIM (Está Atrativa)" --> B1
-    B1 --> B2
-    B2 --> B3
-    B3 --> G2
-
-    G2 -- "SIM (Subiu muito rápido)" --> WaitStep
-    WaitStep --> C1
-
-    G2 -- "NÃO (Preço Saudável)" --> C1
-    C1 --> C2
-    C2 --> C3
-    C3 --> EndNode
-
-    classDef startEnd fill:#D1E7DD,stroke:#198754,stroke-width:2px,color:#0F5132;
-    classDef stepNode fill:#E7F1FF,stroke:#0D6EFD,stroke-width:2px,color:#084298;
-    classDef gatewayNode fill:#FFF3CD,stroke:#FFC107,stroke-width:2px,color:#664D03;
-    classDef waitNode fill:#F8D7DA,stroke:#DC3545,stroke-width:2px,color:#842029;
-
-    class Start,EndNode startEnd;
-    class A1,A2,A3,B1,B2,B3,C1,C2,C3 stepNode;
-    class G1,G2 gatewayNode;
-    class WaitStep,DiscardStep waitNode;
-          </div>
+    <div id="scrollWrap">
+      <div id="diagramWrap">
+        <div id="stickyHeader">
+          <svg id="headerSvg" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
+        <svg id="bpmnSvg" xmlns="http://www.w3.org/2000/svg"></svg>
       </div>
     </div>
-
-    <!-- Explicação Passo a Passo -->
-    <div class="steps-list">
-      <div class="step-card green">
-        <div class="step-title">🎯 1. Filtro Inicial (Radar de Oportunidades)</div>
-        <div class="step-desc">Filtre setores perenes (Energia, Bancos, Saneamento). A regra de ouro é: <strong>só comprar ações que estejam ABAIXO da Linha Verde (Teto Bazin)</strong> para garantir retorno superior a 6% ao ano em dividendos.</div>
-      </div>
-
-      <div class="step-card">
-        <div class="step-title">🔍 2. Validação da Qualidade (Raio-X do Ativo)</div>
-        <div class="step-desc">Confirme se o <strong>ROE é maior que 12%</strong> (eficiência em gerar lucro) e se a cotação não está disparada no curto prazo longe da média amarela.</div>
-      </div>
-
-      <div class="step-card yellow">
-        <div class="step-title">🧮 3. Simulação & Aporte na Corretora</div>
-        <div class="step-desc">Digite o valor que você tem no <strong>Simulador</strong> para ver a renda anual/mensal gerada. Em seguida, compre no mercado fracionário (ex: <code>CMIG4F</code>, <code>BBAS3F</code>).</div>
-      </div>
-    </div>
-
-    <div class="footer">
-      <p>Desenvolvido por: <strong>Henrique Rosa / Antigravity - V1.0 - 2026</strong></p>
-      <p style="margin-top: 4px;">Acesse online: <a href="https://radar-investimentos-b3.streamlit.app" target="_blank" style="color: var(--accent); text-decoration: none;">radar-investimentos-b3.streamlit.app</a></p>
+    <div id="hint">
+      As colunas coloridas indicam <b>quem executa</b> cada a&ccedil;&atilde;o (Investidor, Dashboard, B3 ou Corretora). 
+      O fluxo acontece de cima para baixo. Os c&iacute;rculos com letra (<b>A</b> e <b>B</b>) s&atilde;o <b>conectores</b>: 
+      o conector <b>A</b> fecha o ciclo da <i>bola de neve</i> dos dividendos. Setas tracejadas indicam alimenta&ccedil;&atilde;o de dados cont&iacute;nua.
+      <br>Desenvolvido por: <b>Henrique Rosa / Antigravity - V1.0 - 2026</b> &middot; App: <a href="https://radar-investimentos-b3.streamlit.app" target="_blank" style="color:#2563eb; text-decoration:none; font-weight:700;">radar-investimentos-b3.streamlit.app</a>
     </div>
   </div>
+</div>
+<div id="tooltip"></div>
 
-  <script>
-    // Inicialização do Mermaid com tema claro
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: 'default',
-      themeVariables: {
-        darkMode: false,
-        background: '#FFFFFF',
-        primaryColor: '#E7F1FF',
-        primaryTextColor: '#084298',
-        primaryBorderColor: '#0D6EFD',
-        lineColor: '#24292F',
-        secondaryColor: '#FFF3CD',
-        tertiaryColor: '#D1E7DD'
-      }
+<script>
+(function () {
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var WIDTH = 1120;
+  var TITLE_H = 132, HEADER_H = 48, ROWH = 118, GAP = 36;
+
+  function el(tag, attrs, kids) {
+    var e = document.createElementNS(SVGNS, tag);
+    attrs = attrs || {};
+    for (var k in attrs) { if (attrs[k] !== null && attrs[k] !== undefined) e.setAttribute(k, attrs[k]); }
+    (kids || []).forEach(function (kid) {
+      if (kid === null || kid === undefined) return;
+      if (typeof kid === 'string') e.appendChild(document.createTextNode(kid));
+      else e.appendChild(kid);
     });
+    return e;
+  }
 
-    // Motor de Zoom e Pan
-    const viewport = document.getElementById('viewport');
-    const zoomContent = document.getElementById('zoomContent');
-    const zoomLevelDisplay = document.getElementById('zoomLevel');
-    const btnZoomIn = document.getElementById('btnZoomIn');
-    const btnZoomOut = document.getElementById('btnZoomOut');
-    const btnReset = document.getElementById('btnReset');
-    const btnFit = document.getElementById('btnFit');
+  var measureCanvas = document.createElement('canvas');
+  var mctx = measureCanvas.getContext('2d');
+  function textWidth(text, font) { mctx.font = font; return mctx.measureText(text).width; }
+  function wrapLines(text, font, maxWidth) {
+    var words = text.split(' ');
+    var lines = []; var cur = '';
+    words.forEach(function (w) {
+      var test = cur ? cur + ' ' + w : w;
+      if (textWidth(test, font) > maxWidth && cur) { lines.push(cur); cur = w; }
+      else { cur = test; }
+    });
+    if (cur) lines.push(cur);
+    return lines;
+  }
 
-    let scale = 1.0;
-    let posX = 0;
-    let posY = 0;
-    let isDragging = false;
-    let startX = 0;
-    let startY = 0;
+  var COLORS = {
+    I: { fill: '#eff6ff', stroke: '#2563eb', band: 'rgba(37,99,235,0.04)' },  // Investidor
+    R: { fill: '#f5f3ff', stroke: '#7c3aed', band: 'rgba(124,58,237,0.04)' }, // Radar B3
+    M: { fill: '#fff7ed', stroke: '#ea580c', band: 'rgba(234,88,12,0.05)' },  // Mercado B3
+    C: { fill: '#f0fdf4', stroke: '#16a34a', band: 'rgba(22,163,74,0.04)' }   // Corretora
+  };
 
-    function updateTransform() {
-      zoomContent.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
-      zoomLevelDisplay.textContent = `${Math.round(scale * 100)}%`;
+  // 4 Colunas Fixas (Raias Verticais)
+  var COLS = [
+    { actor: 'I', x: 185, label: 'Investidor (Você)' },
+    { actor: 'R', x: 435, label: 'Radar B3 (Dashboard)' },
+    { actor: 'M', x: 685, label: 'Mercado & CVM (B3)' },
+    { actor: 'C', x: 935, label: 'Corretora (Home Broker)' }
+  ];
+  var COLW = 250;
+
+  // ---------- SEÇÕES VERTICAIS ----------
+  function buildSections() {
+    var defs = [
+      { key: 's1', title: 'Etapa 1 · Aporte Mensal & Panorama da Bolsa', sub: 'da sobra de caixa até a triagem dos setores perenes', rows: 8 },
+      { key: 's2', title: 'Etapa 2 · Screening Quantitativo & Preços-Teto', sub: 'dos filtros de Graham e Bazin até o pódio de oportunidades', rows: 9 },
+      { key: 's3', title: 'Etapa 3 · Raio-X Técnico, Simulação & Compra', sub: 'do gráfico candlestick até a execução da ordem na corretora', rows: 9 },
+      { key: 's4', title: 'Etapa 4 · Custódia, Dividendos & Bola de Neve', sub: 'do recebimento dos proventos até o reinvestimento contínuo', rows: 8 }
+    ];
+    var y = TITLE_H, out = {};
+    defs.forEach(function (d) {
+      var headerY = y, contentTop = headerY + HEADER_H;
+      var rowCenters = [];
+      for (var i = 0; i < d.rows; i++) rowCenters.push(contentTop + i * ROWH + ROWH / 2);
+      var contentBottom = contentTop + d.rows * ROWH;
+      out[d.key] = { title: d.title, sub: d.sub, headerY: headerY, contentTop: contentTop, contentBottom: contentBottom, rowCenters: rowCenters };
+      y = contentBottom + GAP;
+    });
+    out.__totalHeight = y - GAP + 44;
+    return out;
+  }
+  var S = buildSections();
+  var HEIGHT = S.__totalHeight;
+  var R1 = S.s1.rowCenters, R2 = S.s2.rowCenters, R3 = S.s3.rowCenters, R4 = S.s4.rowCenters;
+
+  // ---------- NÓS (ATIVIDADES, DECISÕES, CONECTORES) ----------
+  var nodes = {
+    // ===== ETAPA 1 =====
+    start: { x: 185, y: R1[0], type: 'start', actor: 'I', label: 'Dia do Aporte Mensal',
+      tip: 'O investidor separa parte da renda mensal (ex: R$ 50, R$ 100, R$ 500) após garantir sua reserva de emergência.' },
+    catchA: { x: 95, y: R1[0], type: 'link', dir: 'catch', letter: 'A', actor: 'I', label: 'Retorno da Bola de Neve',
+      tip: 'Conector A: chegam aqui os dividendos recebidos no mês anterior para serem reinvestidos junto com o dinheiro novo.' },
+    openApp: { x: 185, y: R1[1], type: 'task', actor: 'I', label: 'Acessar o Radar Investimentos B3',
+      tip: 'Abre o link online (radar-investimentos-b3.streamlit.app) no celular ou o atalho run_dashboard.bat no PC.' },
+    fetchData: { x: 435, y: R1[2], type: 'task', actor: 'R', label: 'Coletar cotações e proventos',
+      tip: 'O app consulta dados oficiais via Yahoo Finance/B3: cotação atual, dividendos dos últimos 12 meses, P/L, ROE e balanços.' },
+    marketFeed: { x: 685, y: R1[2], type: 'task', actor: 'M', label: 'Disponibilizar pregão em tempo real',
+      tip: 'A B3 negocia as ações e publica as cotações, variações do Ibovespa e fatos relevantes das companhias.' },
+    showMetrics: { x: 435, y: R1[3], type: 'task', actor: 'R', label: 'Exibir termômetros do mercado',
+      tip: 'Mostra cards com Ibovespa, Dólar PTAX, quantidade de ações com DY >= 6% e ações com desconto de Graham > 20%.' },
+    filterSector: { x: 185, y: R1[4], type: 'task', actor: 'I', label: 'Filtrar setores perenes (BEST)',
+      tip: 'No menu lateral, o investidor filtra empresas de Bancos, Energia, Saneamento, Telecomunicações ou Seguros.' },
+    gwReserva: { x: 185, y: R1[5], type: 'gateway', actor: 'I', label: 'Reserva de Emergência OK?',
+      tip: 'Regra de ouro: se não tiver reserva em CDB/Tesouro Selic, guarde lá primeiro. Se já tiver, avance para as ações.' },
+    saveReserva: { x: 935, y: R1[5], type: 'task', actor: 'C', label: 'Guardar em CDB 100% CDI / Selic',
+      tip: 'Proteção financeira básica: mantenha de 3 a 6 meses de custos em renda fixa de liquidez diária antes da bolsa.' },
+    rankScreen: { x: 435, y: R1[6], type: 'task', actor: 'R', label: 'Calcular modelos de Valuation',
+      tip: 'O motor calcula automaticamente: Preço Teto Bazin, Preço Justo de Graham e pontuação da Fórmula Mágica.' },
+    connEtapa2: { x: 185, y: R1[7], type: 'task', actor: 'I', label: 'Analisar Pódios de Oportunidades',
+      tip: 'O investidor analisa as campeãs em dividendos, maior desconto patrimonial e melhor relação qualidade/preço.' },
+
+    // ===== ETAPA 2 =====
+    checkBazin: { x: 185, y: R2[0], type: 'gateway', actor: 'I', label: 'Preço <= Teto Bazin?',
+      tip: 'Decisão Bazin: a cotação da ação está ABAIXO da linha verde de teto? Se sim, garante retorno de dividendos > 6% ao ano.' },
+    discardB: { x: 95, y: R2[1], type: 'link', dir: 'throw', letter: 'B', actor: 'I', label: 'Ação esticada -> Buscar outra',
+      tip: 'Conector B: se a ação estiver acima do teto Bazin, o investidor pausa a compra dela e escolhe outra ação da lista.' },
+    catchB: { x: 95, y: R2[2], type: 'link', dir: 'catch', letter: 'B', actor: 'I', label: 'Volta ao Radar',
+      tip: 'Retorna para a tabela de screening para testar o próximo ativo bem colocado no ranking.' },
+    checkGraham: { x: 185, y: R2[2], type: 'task', actor: 'I', label: 'Verificar Margem de Graham',
+      tip: 'Compara a cotação com a fórmula V = raiz(22.5 * LPA * VPA). Se a margem for positiva, há desconto patrimonial.' },
+    calcMagic: { x: 435, y: R2[3], type: 'task', actor: 'R', label: 'Ordenar pela Fórmula Mágica',
+      tip: 'Cruza menor P/L (barateza) com maior ROE (eficiência do negócio) para ranquear as melhores empresas.' },
+    checkROE: { x: 185, y: R2[4], type: 'gateway', actor: 'I', label: 'ROE >= 12% e Lucro Sólido?',
+      tip: 'Filtro de qualidade: evita armadilhas de valor (empresas baratas mas que estão quebrando ou dando prejuízo).' },
+    checkDebt: { x: 435, y: R2[5], type: 'task', actor: 'R', label: 'Conferir endividamento e margens',
+      tip: 'O dashboard apresenta a Margem Líquida e Dívida Líquida para certificar que a empresa tem saúde financeira.' },
+    pickWinner: { x: 185, y: R2[6], type: 'task', actor: 'I', label: 'Selecionar ativo vencedor (ex: CMIG4)',
+      tip: 'O investidor bate o martelo na ação que reuniu o melhor conjunto de dividendos fartos, desconto e segurança.' },
+    flagDiag: { x: 435, y: R2[7], type: 'task', actor: 'R', label: 'Exibir selo Verde (Forte Oportunidade)',
+      tip: 'O dashboard marca o ativo com a tag 🟢 Forte Oportunidade ou 🟢 Atrativa para fácil identificação visual.' },
+    goToRaioX: { x: 185, y: R2[8], type: 'task', actor: 'I', label: 'Abrir a aba Raio-X do Ativo',
+      tip: 'O investidor clica na 2ª aba para ver os gráficos e detalhes técnicos antes de comprar.' },
+
+    // ===== ETAPA 3 =====
+    loadCandle: { x: 435, y: R3[0], type: 'task', actor: 'R', label: 'Plotar Gráfico Candlestick & Médias',
+      tip: 'Renderiza gráfico interativo com velas de preços, Média 20d (laranja), Média 200d (azul) e linhas de teto Bazin e Graham.' },
+    checkTiming: { x: 185, y: R3[1], type: 'gateway', actor: 'I', label: 'Preço longe da Média 20d (Euforia)?',
+      tip: 'Análise de timing: se a vela estiver esticada muito acima da linha laranja, houve euforia passageira recente.' },
+    waitPullback: { x: 185, y: R3[2], type: 'task', actor: 'I', label: 'Aguardar respiro ou comprar parcela menor',
+      tip: 'Disciplina: não compre no topo de euforia. Espere alguns dias ou compre metade agora e metade depois.' },
+    openSim: { x: 185, y: R3[3], type: 'task', actor: 'I', label: 'Abrir aba Simulador de Renda',
+      tip: 'O investidor acessa a 3ª aba para simular o poder do seu aporte financeiro daquele mês.' },
+    simCalc: { x: 435, y: R3[4], type: 'task', actor: 'R', label: 'Calcular qtd. de ações e renda passiva',
+      tip: 'Calcula quantas ações inteiras o dinheiro compra e projeta os dividendos anuais e mensais que serão creditados.' },
+    openBroker: { x: 185, y: R3[5], type: 'task', actor: 'I', label: 'Abrir app da Corretora / Banco',
+      tip: 'Acessa o aplicativo da sua corretora de taxa zero (NuInvest, Inter, Rico, Clear, XP, etc.).' },
+    sendOrder: { x: 935, y: R3[6], type: 'task', actor: 'C', label: 'Digitar ticker fracionário (ex: CMIG4F)',
+      tip: 'No Home Broker, usa a letra F no final para comprar a quantidade exata (de 1 a 99 ações) sem precisar de lote padrão de 100.' },
+    execTrade: { x: 685, y: R3[7], type: 'task', actor: 'M', label: 'Casar ordem e liquidar na B3',
+      tip: 'A B3 registra a operação e transfere a titularidade das ações para o CPF do investidor em D+2.' },
+    orderDone: { x: 935, y: R3[8], type: 'end', actor: 'C', label: 'Ações custodiadas com sucesso',
+      tip: 'Fim da operação de compra: agora você é oficialmente sócio e coproprietário da empresa!' },
+
+    // ===== ETAPA 4 =====
+    waitDivs: { x: 685, y: R4[0], type: 'timer', actor: 'M', label: 'Aprovação de dividendos em AGE/Conselho',
+      tip: 'Evento de tempo: a empresa encerra o trimestre com lucro e declara o pagamento de Dividendos e JCP aos acionistas.' },
+    dateCom: { x: 685, y: R4[1], type: 'task', actor: 'M', label: 'Passagem da Data-Com',
+      tip: 'Quem possuía as ações na carteira até o fechamento da Data-Com tem direito adquirido aos proventos anunciados.' },
+    payDivs: { x: 935, y: R4[2], type: 'task', actor: 'C', label: 'Creditar dinheiro limpo na conta',
+      tip: 'A corretora deposita os proventos em dinheiro vivo na conta do investidor, 100% livres de imposto de renda.' },
+    divNotice: { x: 185, y: R4[3], type: 'task', actor: 'I', label: 'Notar dividendos caindo na conta',
+      tip: 'O investidor recebe a notificação no celular: o dinheiro da sua participação nos lucros foi creditado.' },
+    reinvestGw: { x: 185, y: R4[4], type: 'gateway', actor: 'I', label: 'Reinvestir os proventos?',
+      tip: 'A chave da riqueza: gastar os dividendos estagna o patrimônio; reinvesti-los acelera a multiplicação exponencial.' },
+    snowball: { x: 185, y: R4[5], type: 'task', actor: 'I', label: 'Juntar dividendos ao novo salário/aporte',
+      tip: 'Soma os proventos recebidos com a nova economia do mês. O poder de compra de ações agora é maior do que antes.' },
+    throwA: { x: 185, y: R4[6], type: 'link', dir: 'throw', letter: 'A', actor: 'I', label: 'Volta para Etapa 1 (Bola de Neve)',
+      tip: 'Conector A: reinicia o fluxo na Etapa 1. O efeito bola de neve está ativo: mais ações geram mais dividendos, que compram mais ações!' }
+  };
+
+  // ---------- CONEXÕES (EDGES) ----------
+  var edges = [
+    // Etapa 1
+    { from: 'start', to: 'openApp' },
+    { from: 'catchA', to: 'openApp' },
+    { from: 'openApp', to: 'fetchData' },
+    { from: 'marketFeed', to: 'fetchData', dashed: true, label: 'Feed B3' },
+    { from: 'fetchData', to: 'showMetrics' },
+    { from: 'showMetrics', to: 'filterSector' },
+    { from: 'filterSector', to: 'gwReserva' },
+    { from: 'gwReserva', to: 'saveReserva', label: 'Sem reserva',
+      points: [[185, R1[5]], [185, R1[5] + 34], [935, R1[5] + 34], [935, R1[5]]],
+      labelAt: [560, R1[5] + 34] },
+    { from: 'gwReserva', to: 'rankScreen', label: 'Reserva OK' },
+    { from: 'rankScreen', to: 'connEtapa2' },
+
+    // Etapa 2
+    { from: 'connEtapa2', to: 'checkBazin' },
+    { from: 'checkBazin', to: 'discardB', label: 'Não (Cara)',
+      points: [[185, R2[0]], [185, R2[0] + 34], [95, R2[0] + 34], [95, R2[1]]],
+      labelAt: [135, R2[0] + 34] },
+    { from: 'discardB', to: 'catchB' },
+    { from: 'checkBazin', to: 'checkGraham', label: 'Sim (Barata)' },
+    { from: 'checkGraham', to: 'calcMagic' },
+    { from: 'calcMagic', to: 'checkROE' },
+    { from: 'checkROE', to: 'checkDebt', label: 'Sim' },
+    { from: 'checkROE', to: 'discardB', label: 'Não (Baixa Qualidade)', dashed: true,
+      points: [[185, R2[4]], [38, R2[4]], [38, R2[1]], [95, R2[1]]],
+      labelAt: [60, R2[3]] },
+    { from: 'checkDebt', to: 'pickWinner' },
+    { from: 'pickWinner', to: 'flagDiag' },
+    { from: 'flagDiag', to: 'goToRaioX' },
+
+    // Etapa 3
+    { from: 'goToRaioX', to: 'loadCandle' },
+    { from: 'loadCandle', to: 'checkTiming' },
+    { from: 'checkTiming', to: 'waitPullback', label: 'Sim (Euforia)' },
+    { from: 'checkTiming', to: 'openSim', label: 'Não (Normal)' },
+    { from: 'waitPullback', to: 'openSim' },
+    { from: 'openSim', to: 'simCalc' },
+    { from: 'simCalc', to: 'openBroker' },
+    { from: 'openBroker', to: 'sendOrder' },
+    { from: 'sendOrder', to: 'execTrade' },
+    { from: 'execTrade', to: 'orderDone' },
+
+    // Etapa 4
+    { from: 'orderDone', to: 'waitDivs', dashed: true,
+      points: [[935, R3[8]], [935, R3[8] + 45], [685, R3[8] + 45], [685, R4[0]]],
+      labelAt: [810, R3[8] + 45] },
+    { from: 'waitDivs', to: 'dateCom' },
+    { from: 'dateCom', to: 'payDivs' },
+    { from: 'payDivs', to: 'divNotice' },
+    { from: 'divNotice', to: 'reinvestGw' },
+    { from: 'reinvestGw', to: 'snowball', label: 'Sim (Multiplicar)' },
+    { from: 'reinvestGw', to: 'orderDone', label: 'Não (Sacar/Gastar)', dashed: true,
+      points: [[185, R4[4]], [38, R4[4]], [38, R4[6] + 40], [935, R4[6] + 40], [935, R4[6]]],
+      labelAt: [480, R4[6] + 40] },
+    { from: 'snowball', to: 'throwA' }
+  ];
+
+  // ---------- MONTAGEM DO SVG ----------
+  var headerSvg = document.getElementById('headerSvg');
+  headerSvg.setAttribute('viewBox', '0 0 ' + WIDTH + ' ' + TITLE_H);
+  headerSvg.setAttribute('width', WIDTH);
+  headerSvg.setAttribute('height', TITLE_H);
+
+  var svg = document.getElementById('bpmnSvg');
+  svg.setAttribute('viewBox', '0 ' + TITLE_H + ' ' + WIDTH + ' ' + (HEIGHT - TITLE_H));
+  svg.setAttribute('width', WIDTH);
+  svg.setAttribute('height', HEIGHT - TITLE_H);
+
+  svg.appendChild(el('defs', {}, [
+    el('marker', { id: 'arrow', viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' }, [
+      el('path', { d: 'M0,0 L10,5 L0,10 z', fill: '#475569' })
+    ])
+  ]));
+
+  svg.appendChild(el('rect', { x: 0, y: TITLE_H, width: WIDTH, height: HEIGHT - TITLE_H, fill: '#ffffff' }));
+  headerSvg.appendChild(el('rect', { x: 0, y: 0, width: WIDTH, height: TITLE_H, fill: '#ffffff' }));
+
+  headerSvg.appendChild(el('text', { x: WIDTH / 2, y: 32, 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 800, fill: '#0f172a' }, ['Processo BPMN Vertical - Radar Investimentos B3']));
+  headerSvg.appendChild(el('text', { x: WIDTH / 2, y: 53, 'text-anchor': 'middle', 'font-size': 12.5, fill: '#475569' }, ['Fluxo ponta a ponta do Investidor Inteligente — passe o mouse sobre cada elemento para ver a explicação']));
+
+  // Legenda Centralizada
+  var legendItems = [
+    { shape: 'circle-thin', label: 'Início do Aporte' },
+    { shape: 'circle-thick', label: 'Fim / Conclusão' },
+    { shape: 'rect', label: 'Atividade / Tarefa' },
+    { shape: 'diamond', label: 'Portão de Decisão' },
+    { shape: 'timer', label: 'Data dos Dividendos' },
+    { shape: 'link', label: 'Conector (Bola de Neve)' }
+  ];
+  var lfont = '11.5px Segoe UI, Arial, sans-serif';
+  var legendTotal = 0;
+  legendItems.forEach(function (it, i) { legendTotal += 22 + textWidth(it.label, lfont) + (i < legendItems.length - 1 ? 24 : 0); });
+  var lx = (WIDTH - legendTotal) / 2, gy = 74;
+  legendItems.forEach(function (it) {
+    if (it.shape === 'circle-thin') {
+      headerSvg.appendChild(el('circle', { cx: lx + 8, cy: gy, r: 8, fill: '#fff', stroke: '#16a34a', 'stroke-width': 2 }));
+    } else if (it.shape === 'circle-thick') {
+      headerSvg.appendChild(el('circle', { cx: lx + 8, cy: gy, r: 8, fill: '#fff', stroke: '#b91c1c', 'stroke-width': 3 }));
+    } else if (it.shape === 'rect') {
+      headerSvg.appendChild(el('rect', { x: lx, y: gy - 8, width: 16, height: 16, rx: 4, fill: '#eff6ff', stroke: '#2563eb', 'stroke-width': 2 }));
+    } else if (it.shape === 'diamond') {
+      headerSvg.appendChild(el('rect', { x: lx, y: gy - 8, width: 16, height: 16, fill: '#fef3c7', stroke: '#d97706', 'stroke-width': 2, transform: 'rotate(45 ' + (lx + 8) + ' ' + gy + ')' }));
+    } else if (it.shape === 'timer') {
+      headerSvg.appendChild(el('circle', { cx: lx + 8, cy: gy, r: 8, fill: '#fff', stroke: '#ea580c', 'stroke-width': 2 }));
+      headerSvg.appendChild(el('path', { d: 'M' + (lx + 8) + ',' + (gy - 4) + ' L' + (lx + 8) + ',' + gy + ' L' + (lx + 11.5) + ',' + (gy + 2), fill: 'none', stroke: '#ea580c', 'stroke-width': 1.6, 'stroke-linecap': 'round' }));
+    } else {
+      headerSvg.appendChild(el('circle', { cx: lx + 8, cy: gy, r: 8, fill: '#fff', stroke: '#475569', 'stroke-width': 1.6 }));
+      headerSvg.appendChild(el('circle', { cx: lx + 8, cy: gy, r: 5.4, fill: '#fff', stroke: '#475569', 'stroke-width': 1.4 }));
+    }
+    headerSvg.appendChild(el('text', { x: lx + 22, y: gy + 4, 'font-size': 11.5, fill: '#334155' }, [it.label]));
+    lx += 22 + textWidth(it.label, lfont) + 24;
+  });
+
+  // Cabeçalhos das Raias (Fixos no Topo Sticky)
+  COLS.forEach(function (col) {
+    var c = COLORS[col.actor];
+    headerSvg.appendChild(el('rect', { x: col.x - 110, y: 96, width: 220, height: 30, rx: 8, fill: c.stroke }));
+    headerSvg.appendChild(el('text', { x: col.x, y: 116, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, fill: '#fff' }, [col.label]));
+  });
+
+  // Faixas Verticais das Raias (do topo ao fim)
+  var bandTop = TITLE_H, bandBottom = HEIGHT - 34;
+  COLS.forEach(function (col) {
+    var c = COLORS[col.actor];
+    svg.appendChild(el('rect', { x: col.x - COLW / 2, y: bandTop, width: COLW, height: bandBottom - bandTop, fill: c.band }));
+    svg.appendChild(el('line', { x1: col.x - COLW / 2, y1: bandTop, x2: col.x - COLW / 2, y2: bandBottom, stroke: '#e2e8f0', 'stroke-width': 1 }));
+  });
+
+  // Barras Escuras das Etapas
+  [S.s1, S.s2, S.s3, S.s4].forEach(function (sec) {
+    svg.appendChild(el('rect', { x: 0, y: sec.headerY, width: WIDTH, height: HEADER_H, fill: '#0f172a' }));
+    var ty = sec.headerY + HEADER_H / 2 + 5;
+    svg.appendChild(el('text', { x: 22, y: ty, 'font-size': 15, 'font-weight': 700, fill: '#fff' }, [sec.title]));
+    var tw = textWidth(sec.title, '700 15px Segoe UI, Arial, sans-serif');
+    svg.appendChild(el('text', { x: 22 + tw + 18, y: ty - 1, 'font-size': 12, fill: '#94a3b8' }, [sec.sub]));
+  });
+
+  // ---------- CONEXÕES (LINHAS E SETAS) ----------
+  function edgePoints(edge) {
+    if (edge.points) return edge.points;
+    var a = nodes[edge.from], b = nodes[edge.to];
+    var midY = a.y + (b.y - a.y) / 2;
+    return [[a.x, a.y], [a.x, midY], [b.x, midY], [b.x, b.y]];
+  }
+  edges.forEach(function (edge) {
+    var pts = edgePoints(edge);
+    var d = pts.map(function (p, i) { return (i === 0 ? 'M' : 'L') + p[0] + ',' + p[1]; }).join(' ');
+    svg.appendChild(el('path', {
+      d: d, fill: 'none', stroke: '#475569', 'stroke-width': 2,
+      'stroke-dasharray': edge.dashed ? '7,6' : null, 'marker-end': 'url(#arrow)'
+    }));
+    if (edge.label) {
+      var mid = edge.labelAt || pts[Math.floor(pts.length / 2)];
+      var font = '700 11px Segoe UI, Arial, sans-serif';
+      var tw = textWidth(edge.label, font);
+      svg.appendChild(el('rect', { x: mid[0] - tw / 2 - 6, y: mid[1] - 11, width: tw + 12, height: 18, rx: 5, fill: '#ffffff', stroke: '#cbd5e1' }));
+      svg.appendChild(el('text', { x: mid[0], y: mid[1] + 3, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 700, fill: '#334155' }, [edge.label]));
+    }
+  });
+
+  // ---------- NÓS (DESENHO E TOOLTIPS) ----------
+  var tooltip = document.getElementById('tooltip');
+  function attachTip(group, n) {
+    group.addEventListener('mouseenter', function (e) { showTip(e, n.label, n.tip); highlight(group, true); });
+    group.addEventListener('mousemove', positionTip);
+    group.addEventListener('mouseleave', function () { hideTip(); highlight(group, false); });
+  }
+  function highlight(group, on) {
+    var shape = group.querySelector('.shape');
+    if (shape) shape.setAttribute('stroke-width', on ? 3.5 : 2);
+  }
+  function sideLabel(g, n, offsetX, font, fontSize) {
+    var lines = wrapLines(n.label, font, 170);
+    var w = Math.max.apply(null, lines.map(function (l) { return textWidth(l, font); })) + 16;
+    var x0 = n.x + offsetX;
+    var y0 = n.y - (lines.length * 15) / 2 + 10;
+    g.appendChild(el('rect', { x: x0 - 5, y: y0 - 12, width: w, height: lines.length * 15 + 6, rx: 6, fill: '#ffffff', 'fill-opacity': 0.95, stroke: '#cbd5e1', 'stroke-width': 1 }));
+    lines.forEach(function (line, i) {
+      g.appendChild(el('text', { x: x0, y: y0 + i * 15, 'font-size': fontSize, 'font-weight': 700, fill: '#0f172a' }, [line]));
+    });
+  }
+
+  Object.keys(nodes).forEach(function (id) {
+    var n = nodes[id];
+    var c = COLORS[n.actor];
+    var g = el('g', { class: 'node' }, []);
+
+    if (n.type === 'task') {
+      var w = 210, h = 74;
+      g.appendChild(el('rect', { class: 'shape', x: n.x - w / 2, y: n.y - h / 2, width: w, height: h, rx: 13, ry: 13, fill: c.fill, stroke: c.stroke, 'stroke-width': 2 }));
+      var lines = wrapLines(n.label, '700 12.5px Segoe UI, Arial, sans-serif', w - 20);
+      var lh = 15.5;
+      var startY = n.y - ((lines.length - 1) * lh) / 2 + 4;
+      lines.forEach(function (line, i) {
+        g.appendChild(el('text', { x: n.x, y: startY + i * lh, 'text-anchor': 'middle', 'font-size': 12.5, 'font-weight': 700, fill: '#0f172a' }, [line]));
+      });
+    } else if (n.type === 'gateway') {
+      var s = 62;
+      g.appendChild(el('rect', { class: 'shape', x: n.x - s / 2, y: n.y - s / 2, width: s, height: s, fill: '#fef3c7', stroke: '#d97706', 'stroke-width': 2.3, transform: 'rotate(45 ' + n.x + ' ' + n.y + ')' }));
+      g.appendChild(el('text', { x: n.x, y: n.y + 7, 'text-anchor': 'middle', 'font-size': 21, 'font-weight': 800, fill: '#b45309' }, ['?']));
+      sideLabel(g, n, s / 2 + 16, '700 12px Segoe UI, Arial, sans-serif', 12);
+    } else if (n.type === 'start' || n.type === 'end' || n.type === 'timer') {
+      var r = 27;
+      var col = n.type === 'end' ? '#b91c1c' : (n.type === 'timer' ? '#ea580c' : '#16a34a');
+      g.appendChild(el('circle', { class: 'shape', cx: n.x, cy: n.y, r: r, fill: '#ffffff', stroke: col, 'stroke-width': n.type === 'end' ? 4 : 2.5 }));
+      if (n.type === 'start') {
+        g.appendChild(el('polygon', { points: (n.x - 6) + ',' + (n.y - 9) + ' ' + (n.x - 6) + ',' + (n.y + 9) + ' ' + (n.x + 9) + ',' + n.y, fill: '#16a34a' }));
+      } else if (n.type === 'end') {
+        g.appendChild(el('rect', { x: n.x - 8, y: n.y - 8, width: 16, height: 16, rx: 2, fill: '#b91c1c' }));
+      } else {
+        g.appendChild(el('circle', { cx: n.x, cy: n.y, r: 13, fill: 'none', stroke: col, 'stroke-width': 1.8 }));
+        g.appendChild(el('path', { d: 'M' + n.x + ',' + (n.y - 7) + ' L' + n.x + ',' + n.y + ' L' + (n.x + 6) + ',' + (n.y + 4), fill: 'none', stroke: col, 'stroke-width': 1.8, 'stroke-linecap': 'round' }));
+      }
+      sideLabel(g, n, r + 16, '700 12.5px Segoe UI, Arial, sans-serif', 12.5);
+    } else if (n.type === 'link') {
+      var ro = 25;
+      g.appendChild(el('circle', { class: 'shape', cx: n.x, cy: n.y, r: ro, fill: '#ffffff', stroke: '#475569', 'stroke-width': 2 }));
+      g.appendChild(el('circle', { cx: n.x, cy: n.y, r: ro - 5, fill: n.dir === 'throw' ? '#475569' : '#ffffff', stroke: '#475569', 'stroke-width': 1.6 }));
+      g.appendChild(el('text', { x: n.x, y: n.y + 7, 'text-anchor': 'middle', 'font-size': 19, 'font-weight': 800, fill: n.dir === 'throw' ? '#ffffff' : '#475569' }, [n.letter]));
+      sideLabel(g, n, ro + 16, '700 12px Segoe UI, Arial, sans-serif', 12);
     }
 
-    // Zoom via Botões
-    btnZoomIn.addEventListener('click', () => {
-      scale = Math.min(scale * 1.25, 4.0);
-      updateTransform();
-    });
+    attachTip(g, n);
+    svg.appendChild(g);
+  });
 
-    btnZoomOut.addEventListener('click', () => {
-      scale = Math.max(scale / 1.25, 0.4);
-      updateTransform();
-    });
+  svg.appendChild(el('text', { x: WIDTH / 2, y: HEIGHT - 14, 'text-anchor': 'middle', 'font-size': 11, fill: '#94a3b8' },
+    ['Radar Investimentos B3 • Desenvolvido por: Henrique Rosa / Antigravity - V1.0 - 2026 • ' + new Date().toLocaleDateString('pt-BR')]));
 
-    btnReset.addEventListener('click', () => {
-      scale = 1.0;
-      posX = 0;
-      posY = 0;
-      updateTransform();
-    });
+  // ---------- TOOLTIP INTERATIVO ----------
+  function showTip(e, label, tip) {
+    tooltip.innerHTML = '<div class="tt-title">' + label + '</div><div>' + tip + '</div>';
+    tooltip.style.display = 'block';
+    positionTip(e);
+  }
+  function positionTip(e) {
+    var pad = 18;
+    var x = e.clientX + pad, y = e.clientY + pad;
+    var rect = tooltip.getBoundingClientRect();
+    if (x + rect.width > window.innerWidth - 10) x = e.clientX - rect.width - pad;
+    if (y + rect.height > window.innerHeight - 10) y = e.clientY - rect.height - pad;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
+  }
+  function hideTip() { tooltip.style.display = 'none'; }
 
-    btnFit.addEventListener('click', () => {
-      scale = 0.85;
-      posX = 0;
-      posY = 0;
-      updateTransform();
-    });
+  // ---------- CONTROLE DE ZOOM & SCROLL ----------
+  var zoomRange = document.getElementById('zoomRange');
+  var zoomVal = document.getElementById('zoomVal');
+  function applyZoom() {
+    var pct = parseInt(zoomRange.value, 10);
+    zoomVal.textContent = pct + '%';
+    headerSvg.style.width = (WIDTH * pct / 100) + 'px';
+    headerSvg.style.height = (TITLE_H * pct / 100) + 'px';
+    svg.style.width = (WIDTH * pct / 100) + 'px';
+    svg.style.height = ((HEIGHT - TITLE_H) * pct / 100) + 'px';
+  }
+  zoomRange.addEventListener('input', applyZoom);
+  applyZoom();
 
-    // Zoom via Rodinha do Mouse (Wheel)
-    viewport.addEventListener('wheel', (e) => {
+  // Zoom pela rodinha do mouse no diagrama
+  document.getElementById('scrollWrap').addEventListener('wheel', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) {
       e.preventDefault();
-      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
-      const newScale = Math.min(Math.max(scale * zoomFactor, 0.4), 4.0);
-
-      scale = newScale;
-      updateTransform();
-    }, { passive: false });
-
-    // Pan via Clique e Arraste
-    viewport.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX - posX;
-      startY = e.clientY - posY;
-      viewport.classList.add('grabbing');
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      posX = e.clientX - startX;
-      posY = e.clientY - startY;
-      updateTransform();
-    });
-
-    window.addEventListener('mouseup', () => {
-      isDragging = false;
-      viewport.classList.remove('grabbing');
-    });
-
-    // Suporte a Touch para Celulares
-    let initialTouchDist = null;
-    let initialScale = 1.0;
-
-    viewport.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 1) {
-        isDragging = true;
-        startX = e.touches[0].clientX - posX;
-        startY = e.touches[0].clientY - posY;
-      } else if (e.touches.length === 2) {
-        isDragging = false;
-        initialTouchDist = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        initialScale = scale;
+      var cur = parseInt(zoomRange.value, 10);
+      var next = e.deltaY < 0 ? cur + 5 : cur - 5;
+      if (next >= 40 && next <= 150) {
+        zoomRange.value = next;
+        applyZoom();
       }
-    }, { passive: true });
+    }
+  }, { passive: false });
 
-    viewport.addEventListener('touchmove', (e) => {
-      if (isDragging && e.touches.length === 1) {
-        posX = e.touches[0].clientX - startX;
-        posY = e.touches[0].clientY - startY;
-        updateTransform();
-      } else if (e.touches.length === 2 && initialTouchDist) {
-        const dist = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        scale = Math.min(Math.max(initialScale * (dist / initialTouchDist), 0.4), 4.0);
-        updateTransform();
-      }
-    }, { passive: true });
-
-    viewport.addEventListener('touchend', () => {
-      isDragging = false;
-      initialTouchDist = null;
-    });
-  </script>
-
+  // ---------- DOWNLOAD EM PNG DE ALTA RESOLUÇÃO ----------
+  document.getElementById('downloadBtn').addEventListener('click', function () {
+    var exportSvg = document.createElementNS(SVGNS, 'svg');
+    exportSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    exportSvg.setAttribute('viewBox', '0 0 ' + WIDTH + ' ' + HEIGHT);
+    exportSvg.setAttribute('width', WIDTH);
+    exportSvg.setAttribute('height', HEIGHT);
+    Array.prototype.forEach.call(headerSvg.childNodes, function (n) { exportSvg.appendChild(n.cloneNode(true)); });
+    Array.prototype.forEach.call(svg.childNodes, function (n) { exportSvg.appendChild(n.cloneNode(true)); });
+    var svgStr = new XMLSerializer().serializeToString(exportSvg);
+    var svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+    var url = URL.createObjectURL(svgBlob);
+    var img = new Image();
+    img.onload = function () {
+      var scale = 2; // Alta resolução (2x)
+      var canvas = document.createElement('canvas');
+      canvas.width = WIDTH * scale;
+      canvas.height = HEIGHT * scale;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.scale(scale, scale);
+      ctx.drawImage(img, 0, 0);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(function (blob) {
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'processo-bpmn-vertical-radar-investimentos-b3.png';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      });
+    };
+    img.onerror = function () { alert('Não foi possível gerar o PNG. Tente novamente.'); };
+    img.src = url;
+  });
+})();
+</script>
 </body>
 </html>
