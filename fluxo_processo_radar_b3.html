@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fluxo do Investidor - Radar Investimentos B3</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#0E1117',
+        primaryColor: '#1E222D',
+        primaryTextColor: '#FFFFFF',
+        primaryBorderColor: '#388BFD',
+        lineColor: '#58A6FF',
+        secondaryColor: '#4D3800',
+        tertiaryColor: '#0E4429'
+      }
+    });
+  </script>
+  <style>
+    :root {
+      --bg: #0E1117;
+      --card-bg: #161B22;
+      --border: #30363D;
+      --text: #E6EDF3;
+      --text-muted: #8B949E;
+      --accent: #58A6FF;
+      --green: #3FB950;
+      --yellow: #E3B341;
+      --red: #F85149;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 820px;
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    }
+    .header {
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+      margin-bottom: 25px;
+    }
+    .header h1 {
+      font-size: 26px;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+    .header p {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(56, 139, 253, 0.15);
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+    .mermaid-box {
+      background: #0D1117;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 25px 0;
+      overflow-x: auto;
+      text-align: center;
+    }
+    .steps-list {
+      margin-top: 30px;
+      display: grid;
+      gap: 16px;
+    }
+    .step-card {
+      background: #1C2128;
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 16px;
+      transition: transform 0.2s;
+    }
+    .step-card:hover {
+      transform: translateY(-2px);
+    }
+    .step-card.green { border-left-color: var(--green); }
+    .step-card.yellow { border-left-color: var(--yellow); }
+    .step-card.red { border-left-color: var(--red); }
+    .step-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .footer {
+      text-align: center;
+      margin-top: 35px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .footer strong {
+      color: var(--accent);
+    }
+    @media print {
+      body { background: white; color: black; }
+      .container { border: none; box-shadow: none; width: 100%; max-width: 100%; }
+      .step-card { background: #f5f5f5; color: black; border-left: 4px solid #333; }
+      .mermaid-box { background: white; border: 1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>📈 Radar Investimentos B3</h1>
+      <p>Fluxo de Decisão do Investidor Inteligente (Passo a Passo Descomplicado)</p>
+      <span class="badge">Processo BPMN Vertical • Guia do Usuário</span>
+    </div>
+
+    <div class="mermaid-box">
+      <div class="mermaid">
+flowchart TD
+    Start(["🟢 Início: Dia do Aporte Mensal\n(Você tem dinheiro novo para investir)"])
+
+    subgraph Fase1 ["Fase 1: Triagem & Filtros (Radar de Oportunidades)"]
+        A1["1. Abrir o Dashboard e Atualizar Cotações"]
+        A2["2. Filtrar Setores Perenes (BEST)\n(Energia, Saneamento ou Bancos)"]
+        A3["3. Olhar os Pódios: Top Dividendos & Top Graham"]
+    end
+
+    subgraph Decisao1 ["Portão de Decisão: Preço & Proventos"]
+        G1{"A ação está ABAIXO\ndo Preço Teto Bazin\n(Preço atual <= Linha Verde)?"}
+    end
+
+    subgraph Fase2 ["Fase 2: Raio-X & Saúde da Empresa"]
+        B1["4. Abrir a aba 'Raio-X do Ativo'"]
+        B2["5. Validar Indicadores de Qualidade:\n• ROE >= 12% (empresa lucrativa)\n• P/L < 12x (preço acessível)\n• Margem Graham positiva"]
+        B3["6. Olhar o Gráfico Candlestick:\nO preço está longe da média amarela (euforia)?"]
+    end
+
+    subgraph Decisao2 ["Portão de Timing de Compra"]
+        G2{"O preço está esticado\nno curto prazo?"}
+    end
+
+    subgraph Fase3 ["Fase 3: Simulação & Execução"]
+        C1["7. Abrir a aba 'Simulador de Renda'\nDigitar o valor que você tem (ex: R$ 100, R$ 500)"]
+        C2["8. Ver o total de ações a comprar e\na renda anual/mensal projetada"]
+        C3["9. Abrir o aplicativo da sua Corretora\nComprar as ações no fracionário (ex: CMIG4F)"]
+    end
+
+    WaitStep["Aguardar alguns dias para o preço respirar\nou comprar uma parcela menor"]
+    DiscardStep["Pausar compras desta ação e\nescolher outra da lista abaixo do teto"]
+    EndNode(["🏁 Fim: Ações Compradas!\n(Dividendos pingando na conta para reinvestir)"])
+
+    Start --> A1
+    A1 --> A2
+    A2 --> A3
+    A3 --> G1
+
+    G1 -- "NÃO (Está Cara)" --> DiscardStep
+    DiscardStep --> A2
+
+    G1 -- "SIM (Está Atrativa)" --> B1
+    B1 --> B2
+    B2 --> B3
+    B3 --> G2
+
+    G2 -- "SIM (Subiu muito rápido)" --> WaitStep
+    WaitStep --> C1
+
+    G2 -- "NÃO (Preço Saudável)" --> C1
+    C1 --> C2
+    C2 --> C3
+    C3 --> EndNode
+
+    classDef startEnd fill:#0E4429,stroke:#3FB950,stroke-width:2px,color:#FFFFFF;
+    classDef stepNode fill:#1E222D,stroke:#388BFD,stroke-width:2px,color:#FFFFFF;
+    classDef gatewayNode fill:#4D3800,stroke:#E3B341,stroke-width:2px,color:#FFFFFF;
+    classDef waitNode fill:#4B1A1D,stroke:#F85149,stroke-width:2px,color:#FFFFFF;
+
+    class Start,EndNode startEnd;
+    class A1,A2,A3,B1,B2,B3,C1,C2,C3 stepNode;
+    class G1,G2 gatewayNode;
+    class WaitStep,DiscardStep waitNode;
+      </div>
+    </div>
+
+    <div class="steps-list">
+      <div class="step-card green">
+        <div class="step-title">🎯 1. Filtro Inicial (Radar de Oportunidades)</div>
+        <div class="step-desc">Abra o dashboard e filtre setores perenes (Energia, Bancos, Saneamento). A regra de ouro é: <strong>só comprar ações que estejam ABAIXO da Linha Verde (Teto Bazin)</strong> para garantir mais de 6% ao ano em dividendos.</div>
+      </div>
+
+      <div class="step-card">
+        <div class="step-title">🔍 2. Validação da Qualidade (Raio-X do Ativo)</div>
+        <div class="step-desc">Confirme se o <strong>ROE é maior que 12%</strong> (mostra que a empresa sabe gerar lucro) e se a cotação não está disparada lá no alto longe da média amarela (evite comprar na euforia).</div>
+      </div>
+
+      <div class="step-card yellow">
+        <div class="step-title">🧮 3. Simulação & Aporte na Corretora</div>
+        <div class="step-desc">Digite o valor que você vai investir (ex: R$ 100, R$ 500) no <strong>Simulador</strong> para ver a renda passiva que vai gerar. Depois, abra o aplicativo da sua corretora e compre no mercado fracionário (ex: <code>CMIG4F</code>, <code>BBAS3F</code>).</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Desenvolvido por: <strong>Henrique Rosa / Antigravity - V1.0 - 2026</strong></p>
+      <p style="margin-top: 4px;">Acesse online: <a href="https://radar-investimentos-b3.streamlit.app" target="_blank" style="color: var(--accent); text-decoration: none;">radar-investimentos-b3.streamlit.app</a></p>
+    </div>
+  </div>
+
+</body>
+</html>

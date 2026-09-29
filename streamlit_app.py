@@ -1,6 +1,7 @@
 """
-Dashboard Inteligente de Ações da B3 - Análise Fundamentalista, Graham, Bazin e Tempo Real.
-Enriquecido com tooltips explicativos para investidores leigos e iniciantes.
+Radar Investimentos B3 - Terminal de Inteligência em Ações.
+Versão 1.0 - Desenvolvido por: Henrique Rosa / Antigravity
+Enriquecido com tooltips interativos diretamente nos títulos, filtros, gráficos e simulador.
 """
 
 import streamlit as st
@@ -19,9 +20,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Estilização CSS customizada
+# Estilização CSS customizada e Tooltips Globais
 st.markdown("""
 <style>
+    /* Estilos de cartões e métricas */
     .metric-card {
         background-color: #1E222D;
         border-radius: 10px;
@@ -29,47 +31,53 @@ st.markdown("""
         border: 1px solid #2A2E39;
         margin-bottom: 10px;
     }
-    .metric-title {
-        color: #9E9E9E;
-        font-size: 13px;
-        font-weight: 500;
+    
+    /* Tooltip direto nos rótulos e títulos */
+    .tooltip-label {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: #E6EDF3;
         margin-bottom: 4px;
-    }
-    .metric-value {
-        color: #FFFFFF;
-        font-size: 24px;
-        font-weight: 700;
-    }
-    .badge-green {
-        background-color: #0E4429;
-        color: #3FB950;
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 12px;
-    }
-    .badge-red {
-        background-color: #4B1A1D;
-        color: #F85149;
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 12px;
-    }
-    .badge-yellow {
-        background-color: #4D3800;
-        color: #E3B341;
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 12px;
-    }
-    /* Estilização para tooltips customizados em textos */
-    .tooltip-icon {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         cursor: help;
+        border-bottom: 1px dotted #388BFD;
+        padding-bottom: 2px;
+    }
+    .tooltip-label:hover {
         color: #58A6FF;
-        font-size: 14px;
-        margin-left: 4px;
+        border-bottom: 1px solid #58A6FF;
+    }
+
+    .badge-help {
+        background-color: rgba(56, 139, 253, 0.15);
+        color: #58A6FF;
+        font-size: 11px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    .podio-header {
+        cursor: help;
+        border-bottom: 1px dotted #8B949E;
+        padding-bottom: 4px;
+        display: inline-block;
+    }
+    .podio-header:hover {
+        color: #58A6FF;
+    }
+
+    .tab-banner {
+        background-color: #161B22;
+        border-left: 4px solid #388BFD;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 13.5px;
+        color: #C9D1D9;
+        margin-bottom: 16px;
+        cursor: help;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -79,7 +87,7 @@ st.sidebar.image("https://img.icons8.com/fluency/96/bullish.png", width=64)
 st.sidebar.title("Radar Investimentos B3")
 st.sidebar.caption("Investimentos Inteligentes na Bolsa")
 
-# Botão de atualização com tooltip explicativo
+# Botão de atualização
 if st.sidebar.button(
     "🔄 Atualizar Cotações Agora",
     use_container_width=True,
@@ -98,46 +106,68 @@ df_all = pd.DataFrame(processed_stocks)
 st.sidebar.markdown("---")
 st.sidebar.subheader("🎯 Filtros do Screening")
 
-# Filtro por Setor
+# 1. Filtro por Setor com Tooltip Direto no Rótulo
 all_sectors = ["Todos"] + sorted(list(df_all["sector"].dropna().unique())) if not df_all.empty else ["Todos"]
+st.sidebar.markdown(
+    '<div class="tooltip-label" title="Escolha a área da economia. Dica: Setores perenes como Energia Elétrica, Saneamento e Bancos pagam os dividendos mais seguros e constantes.">🏢 Setor de Atuação <span class="badge-help">ℹ️ passe o mouse</span></div>',
+    unsafe_allow_html=True
+)
 selected_sector = st.sidebar.selectbox(
     "Setor de Atuação",
     all_sectors,
-    help="Permite filtrar as empresas por área da economia. Dica: 'Energia & Saneamento' e 'Financeiro & Seguros' são os setores mais seguros e previsíveis para quem quer dividendos."
+    label_visibility="collapsed"
 )
 
-# Sliders de Filtro com tooltips
+# 2. Dividend Yield com Tooltip Direto no Rótulo
+st.sidebar.markdown(
+    '<div class="tooltip-label" title="Dividend Yield (DY): Percentual do preço da ação que a empresa devolveu em dinheiro aos acionistas no último ano. O método Décio Bazin recomenda buscar empresas que pagam mais de 6% ao ano.">💰 Dividend Yield Mínimo (%) <span class="badge-help">ℹ️ passe o mouse</span></div>',
+    unsafe_allow_html=True
+)
 min_dy = st.sidebar.slider(
     "Dividend Yield Mínimo (%)",
     min_value=0.0,
     max_value=15.0,
     value=0.0,
     step=0.5,
-    help="Dividend Yield (DY): É o percentual do preço da ação que a empresa devolveu em dinheiro vivo aos sócios nos últimos 12 meses. O método Décio Bazin recomenda buscar ações com DY acima de 6%."
+    label_visibility="collapsed"
 )
 
+# 3. P/L Máximo com Tooltip Direto no Rótulo
+st.sidebar.markdown(
+    '<div class="tooltip-label" title="Preço sobre Lucro (P/L): Mostra quantos anos de lucros atuais recuperam o valor da ação. Quanto menor o P/L (ex: abaixo de 10x), mais barata ela costuma estar.">📊 P/L Máximo (Preço/Lucro) <span class="badge-help">ℹ️ passe o mouse</span></div>',
+    unsafe_allow_html=True
+)
 max_pe = st.sidebar.slider(
     "P/L Máximo (Preço/Lucro)",
     min_value=1.0,
     max_value=40.0,
     value=30.0,
     step=1.0,
-    help="Preço sobre Lucro (P/L): Mostra quantos anos de lucros atuais seriam necessários para recuperar o valor investido na ação. Quanto menor o P/L (ex: abaixo de 10), mais barata a empresa tende a estar."
+    label_visibility="collapsed"
 )
 
+# 4. ROE Mínimo com Tooltip Direto no Rótulo
+st.sidebar.markdown(
+    '<div class="tooltip-label" title="Retorno sobre Patrimônio Líquido (ROE): Mede a capacidade da empresa de transformar o dinheiro dos sócios em lucro real. Acima de 12% a 15% indica uma empresa muito lucrativa e eficiente.">⚡ ROE Mínimo (%) <span class="badge-help">ℹ️ passe o mouse</span></div>',
+    unsafe_allow_html=True
+)
 min_roe = st.sidebar.slider(
     "ROE Mínimo (%)",
     min_value=0.0,
     max_value=40.0,
     value=0.0,
     step=1.0,
-    help="Retorno sobre Patrimônio Líquido (ROE): Mede a eficiência da empresa em transformar o dinheiro dos sócios em lucro real. Acima de 12% a 15% indica uma empresa muito lucrativa e bem gerida."
+    label_visibility="collapsed"
 )
 
+# 5. Desconto de Graham com Tooltip Direto no Rótulo
+st.sidebar.markdown(
+    '<div class="tooltip-label" title="Fórmula de Benjamin Graham: Filtra somente as ações cujo preço na bolsa está mais barato do que o valor intrínseco calculado com base em seus lucros e patrimônio.">💎 Filtro de Pechincha (Graham) <span class="badge-help">ℹ️ passe o mouse</span></div>',
+    unsafe_allow_html=True
+)
 only_graham_discount = st.sidebar.checkbox(
     "Apenas com Desconto de Graham (> 0%)",
-    value=False,
-    help="Filtra somente as ações cujo preço atual está abaixo do Valor Intrínseco calculado pela fórmula de Benjamin Graham (comprando empresa com margem de segurança)."
+    value=False
 )
 
 # Filtragem do DataFrame
@@ -155,7 +185,7 @@ if not df_filtered.empty:
         df_filtered = df_filtered[df_filtered["graham_margin"] > 0]
 
 st.sidebar.markdown("---")
-st.sidebar.info("💡 **Dica de Ouro:** Passe o mouse sobre qualquer interrogação ❓ na tela para ver uma explicação simples e didática de cada termo!")
+st.sidebar.info("💡 **Regra de Ouro:** Foque em empresas de setores perenes com ROE > 12% e preço abaixo do Teto Bazin.")
 
 # ----------------- CABEÇALHO & CARDS PRINCIPAIS -----------------
 st.title("📈 Radar Investimentos B3")
@@ -223,12 +253,18 @@ tab_radar, tab_raiox, tab_simulador, tab_guia = st.tabs([
 
 # ================= TAB 1: RADAR DE OPORTUNIDADES =================
 with tab_radar:
-    st.subheader("Oportunidades em Destaque na B3")
-    
+    st.markdown(
+        '<div class="tab-banner" title="Esta aba rastreia todas as ações da B3 e calcula automaticamente os preços-teto de Bazin e Graham para você saber na hora quem está barato ou caro.">🎯 <strong>Radar de Oportunidades:</strong> Triagem automatizada para identificar ações com desconto e altos dividendos. <em>(Passe o mouse sobre os títulos dos rankings e das colunas para ver explicações detalhadas)</em></div>',
+        unsafe_allow_html=True
+    )
+
     col_rk1, col_rk2, col_rk3 = st.columns(3)
     
     with col_rk1:
-        st.markdown("#### 💰 Top Dividendos (Décio Bazin)")
+        st.markdown(
+            "#### <span class='podio-header' title='Método Décio Bazin: Ações que mais devolveram dinheiro aos sócios nos últimos 12 meses. Compre abaixo do Teto Bazin para garantir mais de 6% ao ano em dividendos.'>💰 Top Dividendos (Décio Bazin) ℹ️</span>",
+            unsafe_allow_html=True
+        )
         st.caption("Ações que mais pagaram proventos nos últimos 12 meses sobre a cotação de hoje.")
         if not df_all.empty:
             top_dy = df_all.sort_values(by="dy", ascending=False).head(5)[["code", "price", "dy", "bazin_price"]]
@@ -246,7 +282,10 @@ with tab_radar:
             )
 
     with col_rk2:
-        st.markdown("#### 💎 Top Margem de Segurança (Graham)")
+        st.markdown(
+            "#### <span class='podio-header' title='Fórmula de Benjamin Graham: Ações com maior margem de segurança. Compara o preço com os lucros e o patrimônio da empresa, encontrando pechinchas.'>💎 Top Margem de Segurança (Graham) ℹ️</span>",
+            unsafe_allow_html=True
+        )
         st.caption("Ações com maior desconto em relação ao Valor Intrínseco de Benjamin Graham.")
         if not df_all.empty:
             top_graham = df_all[df_all["graham_margin"].notnull()].sort_values(by="graham_margin", ascending=False).head(5)[["code", "price", "graham_price", "graham_margin"]]
@@ -264,7 +303,10 @@ with tab_radar:
             )
 
     with col_rk3:
-        st.markdown("#### ⚡ Fórmula Mágica (Greenblatt)")
+        st.markdown(
+            "#### <span class='podio-header' title='Fórmula Mágica de Joel Greenblatt: Combina preço baixo (menor P/L) com alta rentabilidade (maior ROE). Mostra as melhores empresas a preços acessíveis.'>⚡ Fórmula Mágica (Greenblatt) ℹ️</span>",
+            unsafe_allow_html=True
+        )
         st.caption("Combinação ideal: maior rentabilidade (ROE) com menor preço na bolsa (P/L).")
         if not df_all.empty and "magic_rank" in df_all.columns:
             top_magic = df_all.sort_values(by="magic_rank", ascending=True).head(5)[["code", "price", "pe", "roe", "magic_rank"]]
@@ -332,14 +374,21 @@ with tab_radar:
 
 # ================= TAB 2: RAIO-X DO ATIVO =================
 with tab_raiox:
-    st.subheader("Análise Detalhada de Ativo")
+    st.markdown(
+        '<div class="tab-banner" title="Analise em detalhes a saúde financeira de qualquer empresa e veja onde o preço está em relação aos tetos de Graham e Bazin.">🔍 <strong>Raio-X do Ativo:</strong> Análise gráfica e contábil aprofundada. <em>(Passe o mouse diretamente sobre as linhas do gráfico e sobre cada métrica de fundamento para ver o que cada uma indica)</em></div>',
+        unsafe_allow_html=True
+    )
     
     col_sel1, col_sel2 = st.columns([1, 2])
     with col_sel1:
+        st.markdown(
+            '<div class="tooltip-label" title="Escolha qualquer ação monitorada na B3 para carregar o histórico de preços, médias móveis e indicadores de saúde contábil.">📌 Selecione a Ação para Analisar <span class="badge-help">ℹ️ passe o mouse</span></div>',
+            unsafe_allow_html=True
+        )
         selected_code = st.selectbox(
             "Selecione o Ativo para Análise:",
             options=sorted(df_all["code"].tolist()) if not df_all.empty else ["BBAS3"],
-            help="Escolha qualquer ação monitorada na B3 para carregar o gráfico histórico completo de preços, médias móveis e indicadores contábeis."
+            label_visibility="collapsed"
         )
     
     stock_info = df_all[df_all["code"] == selected_code].iloc[0] if not df_all.empty else {}
@@ -387,57 +436,67 @@ with tab_raiox:
                 help="Percentual recebido em proventos nos últimos 12 meses e o valor em reais (R$) pago por cada ação."
             )
 
-        # Gráfico Histórico Interativo Plotly
+        # Gráfico Histórico Interativo Plotly com Tooltips Ricos no Hover
         st.markdown("#### Histórico de Preços e Médias Móveis")
-        st.caption("💡 **Dica do Gráfico:** Barras verdes = dia de alta; Barras vermelhas = dia de baixa. A linha verde tracejada é o Preço Teto Bazin e a linha roxa pontilhada é o Preço Justo Graham.")
+        st.caption("💡 **Dica Interativa:** Passe o mouse sobre as velas e sobre as linhas verde, roxa, laranja e azul para ver a interpretação técnica instantânea!")
         hist_df = get_ticker_history(symbol, period="1y")
 
         if not hist_df.empty:
             fig = go.Figure()
-            # Candlestick
+            
+            # Candlestick com hover detalhado
             fig.add_trace(go.Candlestick(
                 x=hist_df.index,
                 open=hist_df['Open'],
                 high=hist_df['High'],
                 low=hist_df['Low'],
                 close=hist_df['Close'],
-                name="Preço"
+                name="Preço da Ação",
+                hovertemplate="<b>%{x|%d/%m/%Y}</b><br>Fechamento: R$ %{close:.2f}<br>Abertura: R$ %{open:.2f}<br>Máxima: R$ %{high:.2f}<br>Mínima: R$ %{low:.2f}<br><i>(Vela Verde = subiu no dia / Vela Vermelha = caiu)</i><extra></extra>"
             ))
-            # Média 20
+            
+            # Média 20 com hover didático
             fig.add_trace(go.Scatter(
                 x=hist_df.index,
                 y=hist_df['MA20'],
-                line=dict(color='#FFA726', width=1.5),
-                name='Média Móvel 20d (Curto Prazo)'
+                line=dict(color='#FFA726', width=1.8),
+                name='Média 20d (Curto Prazo)',
+                hovertemplate="<b>Média 20 dias (Curto Prazo):</b> R$ %{y:.2f}<br><i>Indica o humor do último mês. Se o preço estiver muito acima, indica euforia rápida.</i><extra></extra>"
             ))
-            # Média 200
+            
+            # Média 200 com hover didático
             fig.add_trace(go.Scatter(
                 x=hist_df.index,
                 y=hist_df['MA200'],
-                line=dict(color='#42A5F5', width=1.5),
-                name='Média Móvel 200d (Longo Prazo)'
+                line=dict(color='#42A5F5', width=2.0),
+                name='Média 200d (Longo Prazo)',
+                hovertemplate="<b>Média 200 dias (Longo Prazo):</b> R$ %{y:.2f}<br><i>Tendência principal de 10 meses. Costuma servir como colchão/suporte para o preço.</i><extra></extra>"
             ))
+            
             # Linha de Preço Teto Bazin
             if bazin:
-                fig.add_hline(
-                    y=bazin,
-                    line_dash="dash",
-                    line_color="#3FB950",
-                    annotation_text=f"Teto Bazin (R$ {bazin:.2f})",
-                    annotation_position="top right"
-                )
+                fig.add_trace(go.Scatter(
+                    x=hist_df.index,
+                    y=[bazin] * len(hist_df),
+                    mode='lines',
+                    line=dict(color='#3FB950', width=1.8, dash='dash'),
+                    name=f'Teto Bazin (R$ {bazin:.2f})',
+                    hovertemplate=f"<b>🟢 TETO BAZIN:</b> R$ {bazin:.2f}<br><b>LIMITE MÁXIMO DE COMPRA!</b><br>Compre ABAIXO desta linha para ter mais de 6% ao ano em dividendos.<extra></extra>"
+                ))
+            
             # Linha de Preço Justo Graham
             if graham:
-                fig.add_hline(
-                    y=graham,
-                    line_dash="dot",
-                    line_color="#A371F7",
-                    annotation_text=f"Teto Graham (R$ {graham:.2f})",
-                    annotation_position="bottom right"
-                )
+                fig.add_trace(go.Scatter(
+                    x=hist_df.index,
+                    y=[graham] * len(hist_df),
+                    mode='lines',
+                    line=dict(color='#A371F7', width=1.8, dash='dot'),
+                    name=f'Teto Graham (R$ {graham:.2f})',
+                    hovertemplate=f"<b>🟣 PREÇO JUSTO GRAHAM:</b> R$ {graham:.2f}<br><b>VALOR INTRÍNSECO DE PECHINCHA!</b><br>Calculado com base no lucro e patrimônio. Abaixo dele a ação está com desconto.<extra></extra>"
+                ))
 
             fig.update_layout(
-                height=450,
+                height=460,
                 template="plotly_dark",
                 xaxis_rangeslider_visible=False,
                 margin=dict(l=20, r=20, t=30, b=20),
@@ -447,18 +506,20 @@ with tab_raiox:
 
         # Cartão de Fundamentos com Tooltips Explicativos
         st.markdown("#### Fundamentos & Saúde da Empresa")
+        st.caption("Passe o mouse sobre os termos abaixo para entender como avaliar a qualidade contábil da empresa:")
+        
         fcol1, fcol2, fcol3, fcol4, fcol5, fcol6 = st.columns(6)
         with fcol1:
             st.metric(
                 "P/L (Preço/Lucro)",
                 f"{pe:.1f}x" if pe else "N/D",
-                help="Mede quantos anos de lucros atuais recuperam o preço da ação. Valores abaixo de 10x são excelentes."
+                help="Preço sobre Lucro: Mostra quantos anos de lucros atuais recuperam o preço pago na ação. Abaixo de 10x é excelente."
             )
         with fcol2:
             st.metric(
                 "P/VP (Patrimônio)",
                 f"{pb:.2f}x" if pb else "N/D",
-                help="Preço da ação dividido pelo Patrimônio Líquido por ação. Abaixo de 1,5x é seguro; abaixo de 1,0x significa comprar a empresa mais barata do que tudo o que ela tem de patrimônio."
+                help="Preço da ação dividido pelo Patrimônio Líquido por ação. Abaixo de 1,5x é seguro; abaixo de 1,0x significa comprar a empresa mais barata do que tudo o que ela tem em bens."
             )
         with fcol3:
             st.metric(
@@ -476,7 +537,7 @@ with tab_raiox:
             st.metric(
                 "LPA (Lucro p/ Ação)",
                 f"R$ {lpa:.2f}" if lpa else "N/D",
-                help="Lucro por Ação: o lucro líquido da empresa no ano dividido pelo número total de ações existentes."
+                help="Lucro por Ação: o lucro líquido total da empresa no último ano dividido pelo total de ações que ela tem no mercado."
             )
         with fcol6:
             st.metric(
@@ -487,37 +548,58 @@ with tab_raiox:
 
 # ================= TAB 3: SIMULADOR =================
 with tab_simulador:
-    st.subheader("Simulador de Preço Teto & Renda Passiva Futura")
-    st.write("Calcule quanto você pode pagar por uma ação e quanto receberá de proventos.")
+    st.markdown(
+        '<div class="tab-banner" title="Calcule o seu preço teto pessoal e projete a renda passiva mensal e anual que cairá na sua conta.">🧮 <strong>Simulador de Renda Passiva:</strong> Ajuste os valores abaixo para descobrir quanto você pode pagar por uma ação e quanto receberá em dinheiro vivo todos os anos.</div>',
+        unsafe_allow_html=True
+    )
     
     col_s1, col_s2 = st.columns(2)
     
     with col_s1:
         st.markdown("#### 1. Parâmetros da Simulação")
+        
+        st.markdown(
+            '<div class="tooltip-label" title="Carrega automaticamente os dividendos recentes e a cotação da ação para preencher a simulação.">📌 Escolha uma Ação como Base <span class="badge-help">ℹ️ passe o mouse</span></div>',
+            unsafe_allow_html=True
+        )
         sim_stock = st.selectbox(
             "Escolha uma ação como base:",
             options=sorted(df_all["code"].tolist()) if not df_all.empty else ["BBAS3"],
             key="sim_select",
-            help="Carrega os dados e o dividendo recente da ação selecionada para facilitar a sua simulação."
+            label_visibility="collapsed"
         )
         sim_info = df_all[df_all["code"] == sim_stock].iloc[0] if not df_all.empty else {}
         
         default_price = float(sim_info.get("price", 30.0))
         default_dpa = float(sim_info.get("estimated_dpa", 2.0))
         
+        st.markdown(
+            '<div class="tooltip-label" title="O valor negociado hoje na bolsa de valores.">💵 Cotação Atual da Ação (R$) <span class="badge-help">ℹ️ passe o mouse</span></div>',
+            unsafe_allow_html=True
+        )
         input_price = st.number_input(
             "Cotação Atual da Ação (R$):",
             value=default_price,
             step=0.5,
             format="%.2f",
-            help="Preço que você paga hoje no balcão da corretora para comprar 1 ação."
+            label_visibility="collapsed"
+        )
+        
+        st.markdown(
+            '<div class="tooltip-label" title="Quanto você estima que a empresa pagará por ano para cada 1 ação que você possuir.">🎁 Dividendo Anual Esperado por Ação (R$) <span class="badge-help">ℹ️ passe o mouse</span></div>',
+            unsafe_allow_html=True
         )
         input_dpa = st.number_input(
             "Dividendo Anual Esperado por Ação (R$):",
             value=default_dpa,
             step=0.1,
             format="%.2f",
-            help="Quanto dinheiro você estima que essa ação pagará por ano para cada unidade que você tiver na carteira."
+            label_visibility="collapsed"
+        )
+        
+        st.markdown(
+            '<div class="tooltip-label" title="A taxa mínima de retorno que você exige (Bazin recomenda 6% ao ano líquidos para aposentadoria com ações).">🎯 Retorno Mínimo Desejado em Proventos (% a.a.) <span class="badge-help">ℹ️ passe o mouse</span></div>',
+            unsafe_allow_html=True
         )
         input_target_dy = st.slider(
             "Taxa Mínima de Retorno em Dividendos Desejada (% a.a.):",
@@ -525,7 +607,7 @@ with tab_simulador:
             max_value=12.0,
             value=6.0,
             step=0.5,
-            help="O retorno mínimo que você exige para investir (Décio Bazin recomenda 6% ao ano livres de impostos)."
+            label_visibility="collapsed"
         )
         
         calculated_teto = input_dpa / (input_target_dy / 100.0) if input_target_dy > 0 else 0
@@ -545,12 +627,17 @@ with tab_simulador:
             st.warning(f"⚠️ **Ação acima do teto.** A cotação atual (R$ {input_price:.2f}) está **{agio:.1f}% mais cara** do que o seu teto para atingir {input_target_dy}%.")
 
         st.markdown("---")
-        st.markdown("#### 3. Projeção de Renda Passiva")
+        st.markdown("#### 3. Projeção de Renda Passiva Futura")
+        
+        st.markdown(
+            '<div class="tooltip-label" title="Digite a quantia em dinheiro que você tem guardada ou planeja investir neste mês.">💰 Quanto você planeja investir? (R$) <span class="badge-help">ℹ️ passe o mouse</span></div>',
+            unsafe_allow_html=True
+        )
         investimento = st.number_input(
             "Valor a Investir (R$):",
             value=10000.0,
             step=1000.0,
-            help="Digite o valor que você planeja aplicar para simular o número de ações que conseguirá comprar e quanto receberá em dividendos."
+            label_visibility="collapsed"
         )
         
         if input_price > 0:
@@ -620,7 +707,7 @@ with tab_guia:
        * Ações oscilam no curto prazo. Tenha 6 meses de custos de vida no Tesouro Selic ou CDB de liquidez diária antes de investir pesado em bolsa.
     """)
 
-# Rodapé
+# Rodapé Oficial com Autoria
 st.markdown("---")
 col_foot1, col_foot2 = st.columns([3, 2])
 with col_foot1:
