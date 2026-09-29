@@ -28,17 +28,32 @@
   }
   #toolbar h1 { margin: 0; color: #fff; font-size: 19px; font-weight: 700; }
   #toolbar p { margin: 4px 0 0; color: #94a3b8; font-size: 12.5px; }
-  #controls { display: flex; align-items: center; gap: 16px; }
-  #controls label { display: flex; align-items: center; gap: 8px; color: #e2e8f0; font-size: 12.5px; }
-  #zoomVal { width: 36px; display: inline-block; color: #e2e8f0; font-weight: 600; }
+  #controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  #controls label { display: flex; align-items: center; gap: 6px; color: #e2e8f0; font-size: 12.5px; }
+  #zoomVal { width: 42px; display: inline-block; color: #e2e8f0; font-weight: 700; text-align: center; }
+  .btn-ctrl {
+    background: #1e293b; color: #e2e8f0; border: 1px solid #475569;
+    padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 4px;
+  }
+  .btn-ctrl:hover { background: #334155; color: #fff; border-color: #64748b; }
+  .btn-ctrl.active { background: #059669; border-color: #10b981; color: #fff; }
+  .btn-icon {
+    width: 28px; height: 28px; padding: 0; justify-content: center;
+    font-size: 15px; font-weight: 800;
+  }
   #downloadBtn {
-    background: #2563eb; color: #fff; border: none; padding: 10px 18px;
-    border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;
+    background: #2563eb; color: #fff; border: none; padding: 8px 16px;
+    border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer;
     box-shadow: 0 2px 6px rgba(37,99,235,0.4);
     transition: background 0.2s;
   }
   #downloadBtn:hover { background: #1d4ed8; }
-  #scrollWrap { overflow: auto; max-height: 80vh; background: #ffffff; }
+  #scrollWrap {
+    overflow: auto; max-height: 80vh; background: #ffffff;
+    cursor: grab; position: relative; user-select: none;
+  }
+  #scrollWrap.grabbing { cursor: grabbing !important; }
   #diagramWrap { position: relative; display: inline-block; }
   #stickyHeader {
     position: sticky; top: 0; z-index: 30;
@@ -72,10 +87,15 @@
         <p>Fluxo ponta a ponta, de cima para baixo &middot; passe o mouse sobre cada elemento para ver a explica&ccedil;&atilde;o</p>
       </div>
       <div id="controls">
-        <label>Zoom
-          <input id="zoomRange" type="range" min="40" max="150" value="65">
+        <label>
+          <button class="btn-ctrl btn-icon" id="btnMinus" title="Diminuir Zoom">−</button>
+          <input id="zoomRange" type="range" min="30" max="200" value="65">
+          <button class="btn-ctrl btn-icon" id="btnPlus" title="Aumentar Zoom">+</button>
           <span id="zoomVal">65%</span>
         </label>
+        <button class="btn-ctrl" id="btnReset" title="Resetar para 100%">100%</button>
+        <button class="btn-ctrl" id="btnFit" title="Ajustar à tela">Ajustar</button>
+        <button class="btn-ctrl active" id="btnWheelToggle" title="Clique para alternar se a rodinha do mouse dá Zoom ou Rola a página">🖱️ Rodinha: Zoom Direto</button>
         <button id="downloadBtn">&#11015; Baixar PNG</button>
       </div>
     </div>
@@ -504,9 +524,18 @@
   }
   function hideTip() { tooltip.style.display = 'none'; }
 
-  // ---------- CONTROLE DE ZOOM & SCROLL ----------
+  // ---------- CONTROLE DE ZOOM & INTERAÇÕES COM MOUSE ----------
   var zoomRange = document.getElementById('zoomRange');
   var zoomVal = document.getElementById('zoomVal');
+  var btnMinus = document.getElementById('btnMinus');
+  var btnPlus = document.getElementById('btnPlus');
+  var btnReset = document.getElementById('btnReset');
+  var btnFit = document.getElementById('btnFit');
+  var btnWheelToggle = document.getElementById('btnWheelToggle');
+  var scrollWrap = document.getElementById('scrollWrap');
+
+  var wheelZoomDirect = true; // Permite zoom direto com a rodinha do mouse
+
   function applyZoom() {
     var pct = parseInt(zoomRange.value, 10);
     zoomVal.textContent = pct + '%';
@@ -518,18 +547,96 @@
   zoomRange.addEventListener('input', applyZoom);
   applyZoom();
 
-  // Zoom pela rodinha do mouse no diagrama
-  document.getElementById('scrollWrap').addEventListener('wheel', function (e) {
-    if (e.ctrlKey || e.metaKey || e.altKey) {
+  // Botões de Zoom + e -
+  btnMinus.addEventListener('click', function () {
+    var cur = parseInt(zoomRange.value, 10);
+    var next = Math.max(30, cur - 10);
+    zoomRange.value = next;
+    applyZoom();
+  });
+
+  btnPlus.addEventListener('click', function () {
+    var cur = parseInt(zoomRange.value, 10);
+    var next = Math.min(200, cur + 10);
+    zoomRange.value = next;
+    applyZoom();
+  });
+
+  btnReset.addEventListener('click', function () {
+    zoomRange.value = 100;
+    applyZoom();
+  });
+
+  btnFit.addEventListener('click', function () {
+    zoomRange.value = 65;
+    applyZoom();
+    scrollWrap.scrollTop = 0;
+    scrollWrap.scrollLeft = 0;
+  });
+
+  // Alternador da Rodinha do Mouse
+  btnWheelToggle.addEventListener('click', function () {
+    wheelZoomDirect = !wheelZoomDirect;
+    if (wheelZoomDirect) {
+      btnWheelToggle.classList.add('active');
+      btnWheelToggle.textContent = '🖱️ Rodinha: Zoom Direto';
+      btnWheelToggle.title = 'A rodinha do mouse amplia ou reduz o zoom diretamente';
+    } else {
+      btnWheelToggle.classList.remove('active');
+      btnWheelToggle.textContent = '📜 Rodinha: Rolar Página';
+      btnWheelToggle.title = 'A rodinha do mouse rola a página (segure Ctrl para dar zoom)';
+    }
+  });
+
+  // 1. Zoom pela Rodinha do Mouse
+  scrollWrap.addEventListener('wheel', function (e) {
+    if (wheelZoomDirect || e.ctrlKey || e.metaKey || e.altKey) {
       e.preventDefault();
       var cur = parseInt(zoomRange.value, 10);
-      var next = e.deltaY < 0 ? cur + 5 : cur - 5;
-      if (next >= 40 && next <= 150) {
+      var step = 8;
+      var next = e.deltaY < 0 ? cur + step : cur - step;
+      if (next >= 30 && next <= 200) {
         zoomRange.value = next;
         applyZoom();
       }
     }
   }, { passive: false });
+
+  // 2. Duplo Clique para Zoom In / Shift + Duplo Clique para Zoom Out
+  scrollWrap.addEventListener('dblclick', function (e) {
+    var cur = parseInt(zoomRange.value, 10);
+    var next = e.shiftKey ? Math.max(30, cur - 20) : Math.min(200, cur + 20);
+    zoomRange.value = next;
+    applyZoom();
+  });
+
+  // 3. Arrastar e Soltar (Pan com o mouse para navegar)
+  var isMouseDown = false, startMouseX, startMouseY, startScrollLeft, startScrollTop;
+  scrollWrap.addEventListener('mousedown', function (e) {
+    if (e.target.closest('.node')) return; // Permite tooltip ao clicar nos nós
+    isMouseDown = true;
+    scrollWrap.classList.add('grabbing');
+    startMouseX = e.pageX - scrollWrap.offsetLeft;
+    startMouseY = e.pageY - scrollWrap.offsetTop;
+    startScrollLeft = scrollWrap.scrollLeft;
+    startScrollTop = scrollWrap.scrollTop;
+  });
+
+  window.addEventListener('mouseup', function () {
+    isMouseDown = false;
+    scrollWrap.classList.remove('grabbing');
+  });
+
+  window.addEventListener('mousemove', function (e) {
+    if (!isMouseDown) return;
+    e.preventDefault();
+    var currentX = e.pageX - scrollWrap.offsetLeft;
+    var currentY = e.pageY - scrollWrap.offsetTop;
+    var moveX = (currentX - startMouseX) * 1.2;
+    var moveY = (currentY - startMouseY) * 1.2;
+    scrollWrap.scrollLeft = startScrollLeft - moveX;
+    scrollWrap.scrollTop = startScrollTop - moveY;
+  });
 
   // ---------- DOWNLOAD EM PNG DE ALTA RESOLUÇÃO ----------
   document.getElementById('downloadBtn').addEventListener('click', function () {
