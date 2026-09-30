@@ -87,14 +87,41 @@ st.sidebar.image("https://img.icons8.com/fluency/96/bullish.png", width=64)
 st.sidebar.title("Radar Investimentos B3")
 st.sidebar.caption("Investimentos Inteligentes na Bolsa")
 
+# ----------------- MENSAGEM DE ABERTURA NO CENTRO DA TELA -----------------
+loading_placeholder = st.empty()
+loading_placeholder.markdown("""
+<div style="
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 70px 30px;
+    text-align: center;
+    background: #161B22;
+    border: 1px solid #30363D;
+    border-radius: 16px;
+    margin: 60px auto;
+    max-width: 660px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+">
+    <div style="font-size: 54px; margin-bottom: 16px;">📈 ⏳</div>
+    <h2 style="color: #58A6FF; margin: 0 0 12px 0; font-size: 25px; font-weight: 700;">Aguarde, atualizando dados da B3...</h2>
+    <p style="color: #8B949E; font-size: 14.5px; line-height: 1.5; margin: 0; max-width: 500px;">
+        Sincronizando cotações em tempo real, proventos recentes e recalculando os preços-teto de <strong>Décio Bazin</strong> e <strong>Benjamin Graham</strong>.
+    </p>
+    <div style="margin-top: 22px; color: #3FB950; font-size: 13px; font-weight: 600;">
+        ⚡ Conectando aos servidores do pregão...
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
 # Botão de atualização
 if st.sidebar.button(
     "🔄 Atualizar Cotações Agora",
     use_container_width=True,
     help="Clique para buscar os preços e fechamentos mais recentes do pregão da B3 direto do Yahoo Finance e recalcular os rankings."
 ):
-    with st.spinner("Atualizando cotações e fundamentos na B3..."):
-        raw_stocks, market_ov = fetch_all_tickers(force_refresh=True)
+    raw_stocks, market_ov = fetch_all_tickers(force_refresh=True)
     st.sidebar.success("Cotações atualizadas com sucesso!")
 else:
     raw_stocks, market_ov = fetch_all_tickers(force_refresh=False)
@@ -102,6 +129,9 @@ else:
 # Aplica os modelos quantitativos
 processed_stocks = apply_valuation_models(raw_stocks)
 df_all = pd.DataFrame(processed_stocks)
+
+# Remove a mensagem de espera central após o término da carga dos dados
+loading_placeholder.empty()
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("🎯 Filtros do Screening")
