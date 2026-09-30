@@ -5,6 +5,7 @@ Enriquecido com tooltips interativos diretamente nos títulos, filtros, gráfico
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import plotly.graph_objects as go
 from datetime import datetime
@@ -21,19 +22,38 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Estilização CSS customizada e Tooltips Globais
+# Estilização CSS customizada e Remoção estrita do GitHub e Fork
 st.markdown("""
 <style>
-    /* Ocultar apenas dados e links do GitHub, deploy e menus padrão do Streamlit */
-    #MainMenu {visibility: hidden; display: none !important;}
-    footer {visibility: hidden; display: none !important;}
-    .stAppDeployButton {visibility: hidden; display: none !important;}
-    [data-testid="manage-app-button"] {visibility: hidden; display: none !important;}
-    a[href*="github.com"] {display: none !important;}
-    .viewerBadge_container__1QSob {visibility: hidden; display: none !important;}
-    div[class*="viewerBadge"] {visibility: hidden; display: none !important;}
-    div[class*="stAppDeployButton"] {visibility: hidden; display: none !important;}
-    div[class*="ToolbarActions"] a[href*="github.com"] {display: none !important;}
+    /* Ocultar especificamente dados do GitHub e o botão Fork (share.streamlit.io) no topo */
+    div[data-testid="stToolbarActions"],
+    div[class*="ToolbarActions"],
+    div[class*="stToolbarActions"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    a[href*="github.com"],
+    a[href*="share.streamlit.io"],
+    a[title*="GitHub"],
+    a[title*="Fork"],
+    button[title*="Fork"],
+    [data-testid*="fork"],
+    [data-testid*="Fork"],
+    .stAppDeployButton,
+    div[class*="stAppDeployButton"],
+    [data-testid="manage-app-button"],
+    div[class*="manageAppButton"],
+    .viewerBadge_container__1QSob,
+    div[class*="viewerBadge"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* Ocultar o iframe invisível de scripts auxiliares */
+    iframe[height="0"] {
+        display: none !important;
+        height: 0 !important;
+    }
 
     /* Ajuste de espaçamento superior para tela limpa */
     .block-container {
@@ -99,6 +119,37 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
+# Script complementar para garantia de remoção contínua do GitHub e Fork
+components.html("""
+<script>
+function purgeGitHubAndFork() {
+    try {
+        const doc = window.parent.document;
+        const selectors = [
+            '[data-testid="stToolbarActions"]',
+            'div[class*="ToolbarActions"]',
+            'div[class*="stToolbarActions"]',
+            'a[href*="github.com"]',
+            'a[href*="share.streamlit.io"]',
+            'button[title*="Fork"]',
+            'a[title*="Fork"]',
+            '[data-testid*="fork"]',
+            '[data-testid*="Fork"]'
+        ];
+        selectors.forEach(sel => {
+            const els = doc.querySelectorAll(sel);
+            els.forEach(el => {
+                el.style.setProperty('display', 'none', 'important');
+                el.style.setProperty('visibility', 'hidden', 'important');
+            });
+        });
+    } catch(e) {}
+}
+purgeGitHubAndFork();
+setInterval(purgeGitHubAndFork, 300);
+</script>
+""", height=0, width=0)
 
 # ----------------- SIDEBAR -----------------
 st.sidebar.image("https://img.icons8.com/fluency/96/bullish.png", width=64)
