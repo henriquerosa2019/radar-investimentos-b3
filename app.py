@@ -8,6 +8,7 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from datetime import datetime
+import time
 
 from data_fetcher import fetch_all_tickers, get_ticker_history, DEFAULT_TICKERS
 from valuation_engine import apply_valuation_models, calculate_graham_price, calculate_bazin_price
@@ -23,27 +24,20 @@ st.set_page_config(
 # Estilização CSS customizada e Tooltips Globais
 st.markdown("""
 <style>
-    /* Ocultar cabeçalho do Streamlit, dados e links do GitHub, menus e rodapés padrão */
+    /* Ocultar apenas dados e links do GitHub, deploy e menus padrão do Streamlit */
     #MainMenu {visibility: hidden; display: none !important;}
-    header {visibility: hidden; display: none !important;}
     footer {visibility: hidden; display: none !important;}
-    [data-testid="stToolbar"] {visibility: hidden; display: none !important;}
-    [data-testid="stDecoration"] {visibility: hidden; display: none !important;}
-    [data-testid="stStatusWidget"] {visibility: hidden; display: none !important;}
-    [data-testid="stHeader"] {visibility: hidden; display: none !important;}
     .stAppDeployButton {visibility: hidden; display: none !important;}
-    [data-testid="stToolbarActions"] {visibility: hidden; display: none !important;}
     [data-testid="manage-app-button"] {visibility: hidden; display: none !important;}
+    a[href*="github.com"] {display: none !important;}
     .viewerBadge_container__1QSob {visibility: hidden; display: none !important;}
     div[class*="viewerBadge"] {visibility: hidden; display: none !important;}
     div[class*="stAppDeployButton"] {visibility: hidden; display: none !important;}
-    div[class*="ToolbarActions"] {visibility: hidden; display: none !important;}
-    div[class*="manageAppButton"] {visibility: hidden; display: none !important;}
-    a[href*="github.com"] {display: none !important;}
-    
+    div[class*="ToolbarActions"] a[href*="github.com"] {display: none !important;}
+
     /* Ajuste de espaçamento superior para tela limpa */
     .block-container {
-        padding-top: 1.5rem !important;
+        padding-top: 2rem !important;
         padding-bottom: 2rem !important;
     }
 
@@ -119,35 +113,41 @@ loading_placeholder.markdown("""
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 70px 30px;
+    padding: 60px 30px;
     text-align: center;
     background: #161B22;
     border: 1px solid #30363D;
     border-radius: 16px;
-    margin: 60px auto;
+    margin: 40px auto;
     max-width: 660px;
     box-shadow: 0 16px 40px rgba(0,0,0,0.5);
 ">
-    <div style="font-size: 54px; margin-bottom: 16px;">📈 ⏳</div>
+    <div style="font-size: 52px; margin-bottom: 14px;">🏃‍♂️ 🏃‍♀️ 📈 ⏳</div>
     <h2 style="color: #58A6FF; margin: 0 0 12px 0; font-size: 25px; font-weight: 700;">Aguarde, atualizando dados da B3...</h2>
-    <p style="color: #8B949E; font-size: 14.5px; line-height: 1.5; margin: 0; max-width: 500px;">
+    <p style="color: #8B949E; font-size: 14.5px; line-height: 1.5; margin: 0; max-width: 520px;">
         Sincronizando cotações em tempo real, proventos recentes e recalculando os preços-teto de <strong>Décio Bazin</strong> e <strong>Benjamin Graham</strong>.
     </p>
-    <div style="margin-top: 22px; color: #3FB950; font-size: 13px; font-weight: 600;">
-        ⚡ Conectando aos servidores do pregão...
+    <div style="margin-top: 22px; color: #3FB950; font-size: 13.5px; font-weight: 600;">
+        ⚡ Conectando aos servidores do pregão e compilando rankings...
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 # Botão de atualização
-if st.sidebar.button(
+is_refresh = st.sidebar.button(
     "🔄 Atualizar Cotações Agora",
     use_container_width=True,
     help="Clique para buscar os preços e fechamentos mais recentes do pregão da B3 direto do Yahoo Finance e recalcular os rankings."
-):
+)
+
+if is_refresh:
     raw_stocks, market_ov = fetch_all_tickers(force_refresh=True)
     st.sidebar.success("Cotações atualizadas com sucesso!")
 else:
+    # No primeiro acesso da sessão, garante exibição suave da mensagem de abertura
+    if "session_initialized" not in st.session_state:
+        st.session_state.session_initialized = True
+        time.sleep(2.0)
     raw_stocks, market_ov = fetch_all_tickers(force_refresh=False)
 
 # Aplica os modelos quantitativos
