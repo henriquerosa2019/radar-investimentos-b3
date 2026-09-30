@@ -23,6 +23,30 @@ st.set_page_config(
 # Estilização CSS customizada e Tooltips Globais
 st.markdown("""
 <style>
+    /* Ocultar cabeçalho do Streamlit, dados e links do GitHub, menus e rodapés padrão */
+    #MainMenu {visibility: hidden; display: none !important;}
+    header {visibility: hidden; display: none !important;}
+    footer {visibility: hidden; display: none !important;}
+    [data-testid="stToolbar"] {visibility: hidden; display: none !important;}
+    [data-testid="stDecoration"] {visibility: hidden; display: none !important;}
+    [data-testid="stStatusWidget"] {visibility: hidden; display: none !important;}
+    [data-testid="stHeader"] {visibility: hidden; display: none !important;}
+    .stAppDeployButton {visibility: hidden; display: none !important;}
+    [data-testid="stToolbarActions"] {visibility: hidden; display: none !important;}
+    [data-testid="manage-app-button"] {visibility: hidden; display: none !important;}
+    .viewerBadge_container__1QSob {visibility: hidden; display: none !important;}
+    div[class*="viewerBadge"] {visibility: hidden; display: none !important;}
+    div[class*="stAppDeployButton"] {visibility: hidden; display: none !important;}
+    div[class*="ToolbarActions"] {visibility: hidden; display: none !important;}
+    div[class*="manageAppButton"] {visibility: hidden; display: none !important;}
+    a[href*="github.com"] {display: none !important;}
+    
+    /* Ajuste de espaçamento superior para tela limpa */
+    .block-container {
+        padding-top: 1.5rem !important;
+        padding-bottom: 2rem !important;
+    }
+
     /* Estilos de cartões e métricas */
     .metric-card {
         background-color: #1E222D;
