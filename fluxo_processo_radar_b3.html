@@ -83,8 +83,8 @@
   <div id="card">
     <div id="toolbar">
       <div>
-        <h1>📈 Processo de Investimento Inteligente - Radar Investimentos B3</h1>
-        <p>Fluxo ponta a ponta, de cima para baixo &middot; passe o mouse sobre cada elemento para ver a explica&ccedil;&atilde;o</p>
+        <h1>📈 Processo de Decisão do Investidor - Radar Investimentos B3</h1>
+        <p>Fluxo completo ponta a ponta, de cima para baixo &middot; passe o mouse sobre cada elemento para ver a explica&ccedil;&atilde;o</p>
       </div>
       <div id="controls">
         <label>
@@ -108,10 +108,9 @@
       </div>
     </div>
     <div id="hint">
-      As colunas coloridas indicam <b>quem executa</b> cada a&ccedil;&atilde;o (Investidor, Dashboard, B3 ou Corretora). 
-      O fluxo acontece de cima para baixo. Os c&iacute;rculos com letra (<b>A</b> e <b>B</b>) s&atilde;o <b>conectores</b>: 
-      o conector <b>A</b> fecha o ciclo da <i>bola de neve</i> dos dividendos. Setas tracejadas indicam alimenta&ccedil;&atilde;o de dados cont&iacute;nua.
-      <br>Desenvolvido por: <b>Henrique Rosa / Antigravity - V1.0 - 2026</b> &middot; App: <a href="https://radar-investimentos-b3.streamlit.app" target="_blank" style="color:#2563eb; text-decoration:none; font-weight:700;">radar-investimentos-b3.streamlit.app</a>
+      As 4 colunas indicam <b>onde cada ação acontece</b> (Investidor, Radar B3, Raio-X/Simulador e Corretora). 
+      O fluxo segue com clareza de cima para baixo. O conector <b>A</b> fecha o ciclo virtuoso do reinvestimento contínuo de dividendos.
+      <br>Desenvolvido por: <b>Henrique Rosa / Antigravity - V1.0 - 2026</b> &middot; Acesse online: <a href="https://radar-investimentos-b3.streamlit.app" target="_blank" style="color:#2563eb; text-decoration:none; font-weight:700;">radar-investimentos-b3.streamlit.app</a>
     </div>
   </div>
 </div>
@@ -121,7 +120,7 @@
 (function () {
   var SVGNS = "http://www.w3.org/2000/svg";
   var WIDTH = 1120;
-  var TITLE_H = 132, HEADER_H = 48, ROWH = 118, GAP = 36;
+  var TITLE_H = 132, HEADER_H = 48, ROWH = 120, GAP = 36;
 
   function el(tag, attrs, kids) {
     var e = document.createElementNS(SVGNS, tag);
@@ -151,28 +150,28 @@
   }
 
   var COLORS = {
-    I: { fill: '#eff6ff', stroke: '#2563eb', band: 'rgba(37,99,235,0.04)' },  // Investidor
-    R: { fill: '#f5f3ff', stroke: '#7c3aed', band: 'rgba(124,58,237,0.04)' }, // Radar B3
-    M: { fill: '#fff7ed', stroke: '#ea580c', band: 'rgba(234,88,12,0.05)' },  // Mercado B3
-    C: { fill: '#f0fdf4', stroke: '#16a34a', band: 'rgba(22,163,74,0.04)' }   // Corretora
+    I: { fill: '#eff6ff', stroke: '#2563eb', band: 'rgba(37,99,235,0.04)' },  // Investidor (Você)
+    R: { fill: '#f5f3ff', stroke: '#7c3aed', band: 'rgba(124,58,237,0.04)' }, // Radar de Oportunidades
+    X: { fill: '#fff7ed', stroke: '#ea580c', band: 'rgba(234,88,12,0.05)' },  // Raio-X & Simulador
+    C: { fill: '#f0fdf4', stroke: '#16a34a', band: 'rgba(22,163,74,0.04)' }   // Corretora & Carteira
   };
 
-  // 4 Colunas Fixas (Raias Verticais)
+  // 4 Raias Claras
   var COLS = [
     { actor: 'I', x: 185, label: 'Investidor (Você)' },
-    { actor: 'R', x: 435, label: 'Radar B3 (Dashboard)' },
-    { actor: 'M', x: 685, label: 'Mercado & CVM (B3)' },
-    { actor: 'C', x: 935, label: 'Corretora (Home Broker)' }
+    { actor: 'R', x: 435, label: 'Radar de Oportunidades' },
+    { actor: 'X', x: 685, label: 'Raio-X & Simulador' },
+    { actor: 'C', x: 935, label: 'Corretora & Carteira' }
   ];
   var COLW = 250;
 
-  // ---------- SEÇÕES VERTICAIS ----------
+  // ---------- SEÇÕES VERTICAIS (FASES NA ÍNTEGRA) ----------
   function buildSections() {
     var defs = [
-      { key: 's1', title: 'Etapa 1 · Aporte Mensal & Panorama da Bolsa', sub: 'da sobra de caixa até a triagem dos setores perenes', rows: 8 },
-      { key: 's2', title: 'Etapa 2 · Screening Quantitativo & Preços-Teto', sub: 'dos filtros de Graham e Bazin até o pódio de oportunidades', rows: 9 },
-      { key: 's3', title: 'Etapa 3 · Raio-X Técnico, Simulação & Compra', sub: 'do gráfico candlestick até a execução da ordem na corretora', rows: 9 },
-      { key: 's4', title: 'Etapa 4 · Custódia, Dividendos & Bola de Neve', sub: 'do recebimento dos proventos até o reinvestimento contínuo', rows: 8 }
+      { key: 's1', title: 'Fase 1 · Triagem & Filtros (Radar de Oportunidades)', sub: 'do aporte inicial até a seleção das melhores pagadoras de dividendos', rows: 6 },
+      { key: 's2', title: 'Portão de Decisão 1 · Preço & Proventos (Décio Bazin)', sub: 'validação se a cotação garante rendimento de dividendos acima de 6% ao ano', rows: 4 },
+      { key: 's3', title: 'Fase 2 · Raio-X & Saúde da Empresa', sub: 'checagem de ROE, P/L, margem de segurança de Graham e timing gráfico', rows: 6 },
+      { key: 's4', title: 'Fase 3 · Simulação & Execução na Corretora', sub: 'projeção de renda futura, compra no mercado fracionário e reinício do ciclo', rows: 6 }
     ];
     var y = TITLE_H, out = {};
     defs.forEach(function (d) {
@@ -190,149 +189,89 @@
   var HEIGHT = S.__totalHeight;
   var R1 = S.s1.rowCenters, R2 = S.s2.rowCenters, R3 = S.s3.rowCenters, R4 = S.s4.rowCenters;
 
-  // ---------- NÓS (ATIVIDADES, DECISÕES, CONECTORES) ----------
+  // ---------- NÓS (CONTEÚDO DO FLUXO NA ÍNTEGRA) ----------
   var nodes = {
-    // ===== ETAPA 1 =====
-    start: { x: 185, y: R1[0], type: 'start', actor: 'I', label: 'Dia do Aporte Mensal',
-      tip: 'O investidor separa parte da renda mensal (ex: R$ 50, R$ 100, R$ 500) após garantir sua reserva de emergência.' },
-    catchA: { x: 95, y: R1[0], type: 'link', dir: 'catch', letter: 'A', actor: 'I', label: 'Retorno da Bola de Neve',
-      tip: 'Conector A: chegam aqui os dividendos recebidos no mês anterior para serem reinvestidos junto com o dinheiro novo.' },
-    openApp: { x: 185, y: R1[1], type: 'task', actor: 'I', label: 'Acessar o Radar Investimentos B3',
-      tip: 'Abre o link online (radar-investimentos-b3.streamlit.app) no celular ou o atalho run_dashboard.bat no PC.' },
-    fetchData: { x: 435, y: R1[2], type: 'task', actor: 'R', label: 'Coletar cotações e proventos',
-      tip: 'O app consulta dados oficiais via Yahoo Finance/B3: cotação atual, dividendos dos últimos 12 meses, P/L, ROE e balanços.' },
-    marketFeed: { x: 685, y: R1[2], type: 'task', actor: 'M', label: 'Disponibilizar pregão em tempo real',
-      tip: 'A B3 negocia as ações e publica as cotações, variações do Ibovespa e fatos relevantes das companhias.' },
-    showMetrics: { x: 435, y: R1[3], type: 'task', actor: 'R', label: 'Exibir termômetros do mercado',
-      tip: 'Mostra cards com Ibovespa, Dólar PTAX, quantidade de ações com DY >= 6% e ações com desconto de Graham > 20%.' },
-    filterSector: { x: 185, y: R1[4], type: 'task', actor: 'I', label: 'Filtrar setores perenes (BEST)',
-      tip: 'No menu lateral, o investidor filtra empresas de Bancos, Energia, Saneamento, Telecomunicações ou Seguros.' },
-    gwReserva: { x: 185, y: R1[5], type: 'gateway', actor: 'I', label: 'Reserva de Emergência OK?',
-      tip: 'Regra de ouro: se não tiver reserva em CDB/Tesouro Selic, guarde lá primeiro. Se já tiver, avance para as ações.' },
-    saveReserva: { x: 935, y: R1[5], type: 'task', actor: 'C', label: 'Guardar em CDB 100% CDI / Selic',
-      tip: 'Proteção financeira básica: mantenha de 3 a 6 meses de custos em renda fixa de liquidez diária antes da bolsa.' },
-    rankScreen: { x: 435, y: R1[6], type: 'task', actor: 'R', label: 'Calcular modelos de Valuation',
-      tip: 'O motor calcula automaticamente: Preço Teto Bazin, Preço Justo de Graham e pontuação da Fórmula Mágica.' },
-    connEtapa2: { x: 185, y: R1[7], type: 'task', actor: 'I', label: 'Analisar Pódios de Oportunidades',
-      tip: 'O investidor analisa as campeãs em dividendos, maior desconto patrimonial e melhor relação qualidade/preço.' },
+    // ===== FASE 1: TRIAGEM & FILTROS =====
+    start: { x: 185, y: R1[0], type: 'start', actor: 'I', label: 'Início: Dia do Aporte Mensal',
+      tip: 'Você tem dinheiro novo disponível para investir após garantir sua reserva de emergência.' },
+    catchA: { x: 80, y: R1[0], type: 'link', dir: 'catch', letter: 'A', actor: 'I', label: 'Retorno dos Dividendos',
+      tip: 'Conector A: chegam aqui os proventos recebidos da carteira para acelerar o efeito bola de neve.' },
+    step1: { x: 435, y: R1[1], type: 'task', actor: 'R', label: '1. Abrir o Dashboard e Atualizar Cotações',
+      tip: 'Acesse o Radar Investimentos B3 e clique em Atualizar Cotações Agora para puxar os dados mais recentes do pregão.' },
+    step2: { x: 185, y: R1[2], type: 'task', actor: 'I', label: '2. Filtrar Setores Perenes (BEST)',
+      tip: 'No menu lateral, selecione setores essenciais: Bancos, Energia Elétrica, Saneamento, Telecomunicações ou Seguros.' },
+    step3: { x: 435, y: R1[3], type: 'task', actor: 'R', label: '3. Olhar os Pódios: Top Dividendos & Top Graham',
+      tip: 'Analise as ações campeãs: quem mais paga dividendos (Bazin), maior desconto patrimonial (Graham) e Fórmula Mágica (Greenblatt).' },
+    chooseCandidate: { x: 185, y: R1[4], type: 'task', actor: 'I', label: 'Selecionar ativo em destaque para avaliar',
+      tip: 'Escolha uma ação bem colocada no ranking (ex: CMIG4, BBAS3, TAEE11, PETR4) para passar pelo filtro rigoroso de preço.' },
 
-    // ===== ETAPA 2 =====
-    checkBazin: { x: 185, y: R2[0], type: 'gateway', actor: 'I', label: 'Preço <= Teto Bazin?',
-      tip: 'Decisão Bazin: a cotação da ação está ABAIXO da linha verde de teto? Se sim, garante retorno de dividendos > 6% ao ano.' },
-    discardB: { x: 95, y: R2[1], type: 'link', dir: 'throw', letter: 'B', actor: 'I', label: 'Ação esticada -> Buscar outra',
-      tip: 'Conector B: se a ação estiver acima do teto Bazin, o investidor pausa a compra dela e escolhe outra ação da lista.' },
-    catchB: { x: 95, y: R2[2], type: 'link', dir: 'catch', letter: 'B', actor: 'I', label: 'Volta ao Radar',
-      tip: 'Retorna para a tabela de screening para testar o próximo ativo bem colocado no ranking.' },
-    checkGraham: { x: 185, y: R2[2], type: 'task', actor: 'I', label: 'Verificar Margem de Graham',
-      tip: 'Compara a cotação com a fórmula V = raiz(22.5 * LPA * VPA). Se a margem for positiva, há desconto patrimonial.' },
-    calcMagic: { x: 435, y: R2[3], type: 'task', actor: 'R', label: 'Ordenar pela Fórmula Mágica',
-      tip: 'Cruza menor P/L (barateza) com maior ROE (eficiência do negócio) para ranquear as melhores empresas.' },
-    checkROE: { x: 185, y: R2[4], type: 'gateway', actor: 'I', label: 'ROE >= 12% e Lucro Sólido?',
-      tip: 'Filtro de qualidade: evita armadilhas de valor (empresas baratas mas que estão quebrando ou dando prejuízo).' },
-    checkDebt: { x: 435, y: R2[5], type: 'task', actor: 'R', label: 'Conferir endividamento e margens',
-      tip: 'O dashboard apresenta a Margem Líquida e Dívida Líquida para certificar que a empresa tem saúde financeira.' },
-    pickWinner: { x: 185, y: R2[6], type: 'task', actor: 'I', label: 'Selecionar ativo vencedor (ex: CMIG4)',
-      tip: 'O investidor bate o martelo na ação que reuniu o melhor conjunto de dividendos fartos, desconto e segurança.' },
-    flagDiag: { x: 435, y: R2[7], type: 'task', actor: 'R', label: 'Exibir selo Verde (Forte Oportunidade)',
-      tip: 'O dashboard marca o ativo com a tag 🟢 Forte Oportunidade ou 🟢 Atrativa para fácil identificação visual.' },
-    goToRaioX: { x: 185, y: R2[8], type: 'task', actor: 'I', label: 'Abrir a aba Raio-X do Ativo',
-      tip: 'O investidor clica na 2ª aba para ver os gráficos e detalhes técnicos antes de comprar.' },
+    // ===== PORTÃO DE DECISÃO 1: PREÇO & PROVENTOS =====
+    gwBazin: { x: 185, y: R2[0], type: 'gateway', actor: 'I', label: 'A ação está ABAIXO do Preço Teto Bazin?',
+      tip: 'Critério Bazin: A cotação atual está menor ou igual à Linha Verde de Teto? Se SIM, garante dividendos >= 6% ao ano livres de impostos.' },
+    discardBazin: { x: 185, y: R2[1], type: 'task', actor: 'I', label: 'Pausar compras desta ação e escolher outra da lista',
+      tip: 'Disciplina: se estiver cara (acima do teto), não compre agora. Volte à lista do Radar e pegue o próximo papel abaixo do teto.' },
+    bazinApproved: { x: 435, y: R2[2], type: 'task', actor: 'R', label: 'Sinal Verde: Preço Atrativo para Dividendos',
+      tip: 'A ação foi aprovada no critério de renda! A cotação atual garante margem de segurança e proventos robustos.' },
 
-    // ===== ETAPA 3 =====
-    loadCandle: { x: 435, y: R3[0], type: 'task', actor: 'R', label: 'Plotar Gráfico Candlestick & Médias',
-      tip: 'Renderiza gráfico interativo com velas de preços, Média 20d (laranja), Média 200d (azul) e linhas de teto Bazin e Graham.' },
-    checkTiming: { x: 185, y: R3[1], type: 'gateway', actor: 'I', label: 'Preço longe da Média 20d (Euforia)?',
-      tip: 'Análise de timing: se a vela estiver esticada muito acima da linha laranja, houve euforia passageira recente.' },
-    waitPullback: { x: 185, y: R3[2], type: 'task', actor: 'I', label: 'Aguardar respiro ou comprar parcela menor',
-      tip: 'Disciplina: não compre no topo de euforia. Espere alguns dias ou compre metade agora e metade depois.' },
-    openSim: { x: 185, y: R3[3], type: 'task', actor: 'I', label: 'Abrir aba Simulador de Renda',
-      tip: 'O investidor acessa a 3ª aba para simular o poder do seu aporte financeiro daquele mês.' },
-    simCalc: { x: 435, y: R3[4], type: 'task', actor: 'R', label: 'Calcular qtd. de ações e renda passiva',
-      tip: 'Calcula quantas ações inteiras o dinheiro compra e projeta os dividendos anuais e mensais que serão creditados.' },
-    openBroker: { x: 185, y: R3[5], type: 'task', actor: 'I', label: 'Abrir app da Corretora / Banco',
-      tip: 'Acessa o aplicativo da sua corretora de taxa zero (NuInvest, Inter, Rico, Clear, XP, etc.).' },
-    sendOrder: { x: 935, y: R3[6], type: 'task', actor: 'C', label: 'Digitar ticker fracionário (ex: CMIG4F)',
-      tip: 'No Home Broker, usa a letra F no final para comprar a quantidade exata (de 1 a 99 ações) sem precisar de lote padrão de 100.' },
-    execTrade: { x: 685, y: R3[7], type: 'task', actor: 'M', label: 'Casar ordem e liquidar na B3',
-      tip: 'A B3 registra a operação e transfere a titularidade das ações para o CPF do investidor em D+2.' },
-    orderDone: { x: 935, y: R3[8], type: 'end', actor: 'C', label: 'Ações custodiadas com sucesso',
-      tip: 'Fim da operação de compra: agora você é oficialmente sócio e coproprietário da empresa!' },
+    // ===== FASE 2: RAIO-X & SAÚDE DA EMPRESA =====
+    step4: { x: 185, y: R3[0], type: 'task', actor: 'I', label: '4. Abrir a aba "Raio-X do Ativo"',
+      tip: 'Navegue até a 2ª aba do dashboard para inspecionar os fundamentos contábeis e os gráficos interativos da ação selecionada.' },
+    step5: { x: 685, y: R3[1], type: 'task', actor: 'X', label: '5. Validar Indicadores de Qualidade:\n• ROE >= 12% (lucrativa)\n• P/L < 12x (preço acessível)\n• Margem Graham positiva',
+      tip: 'Confira a saúde da empresa: ROE mede a eficiência da gestão, P/L mede o tempo de retorno e a Margem Graham garante que você não está pagando ágio.' },
+    step6: { x: 685, y: R3[2], type: 'task', actor: 'X', label: '6. Olhar o Gráfico Candlestick:\nO preço está longe da média amarela (euforia)?',
+      tip: 'Examine o gráfico: velas verdes/vermelhas mostram o preço diário. A linha amarela é a média de 20 dias (curto prazo).' },
+    gwTiming: { x: 185, y: R3[3], type: 'gateway', actor: 'I', label: 'O preço está esticado no curto prazo?',
+      tip: 'Decisão de timing: se a ação subiu em linha reta e está muito longe da média de 20 dias, pode haver um recuo natural nos próximos dias.' },
+    waitPullback: { x: 185, y: R3[4], type: 'task', actor: 'I', label: 'Aguardar alguns dias para o preço respirar ou comprar parcela menor',
+      tip: 'Evite a ansiedade de comprar no topo da euforia: compre metade do lote planejado hoje e guarde o restante para a semana seguinte.' },
+    timingOK: { x: 685, y: R3[4], type: 'task', actor: 'X', label: 'Preço saudável próximo às médias móveis',
+      tip: 'A ação está com cotação estável ou apoiada no suporte das médias de 20 ou 200 dias (ótimo ponto de entrada).' },
 
-    // ===== ETAPA 4 =====
-    waitDivs: { x: 685, y: R4[0], type: 'timer', actor: 'M', label: 'Aprovação de dividendos em AGE/Conselho',
-      tip: 'Evento de tempo: a empresa encerra o trimestre com lucro e declara o pagamento de Dividendos e JCP aos acionistas.' },
-    dateCom: { x: 685, y: R4[1], type: 'task', actor: 'M', label: 'Passagem da Data-Com',
-      tip: 'Quem possuía as ações na carteira até o fechamento da Data-Com tem direito adquirido aos proventos anunciados.' },
-    payDivs: { x: 935, y: R4[2], type: 'task', actor: 'C', label: 'Creditar dinheiro limpo na conta',
-      tip: 'A corretora deposita os proventos em dinheiro vivo na conta do investidor, 100% livres de imposto de renda.' },
-    divNotice: { x: 185, y: R4[3], type: 'task', actor: 'I', label: 'Notar dividendos caindo na conta',
-      tip: 'O investidor recebe a notificação no celular: o dinheiro da sua participação nos lucros foi creditado.' },
-    reinvestGw: { x: 185, y: R4[4], type: 'gateway', actor: 'I', label: 'Reinvestir os proventos?',
-      tip: 'A chave da riqueza: gastar os dividendos estagna o patrimônio; reinvesti-los acelera a multiplicação exponencial.' },
-    snowball: { x: 185, y: R4[5], type: 'task', actor: 'I', label: 'Juntar dividendos ao novo salário/aporte',
-      tip: 'Soma os proventos recebidos com a nova economia do mês. O poder de compra de ações agora é maior do que antes.' },
-    throwA: { x: 185, y: R4[6], type: 'link', dir: 'throw', letter: 'A', actor: 'I', label: 'Volta para Etapa 1 (Bola de Neve)',
-      tip: 'Conector A: reinicia o fluxo na Etapa 1. O efeito bola de neve está ativo: mais ações geram mais dividendos, que compram mais ações!' }
+    // ===== FASE 3: SIMULAÇÃO & EXECUÇÃO =====
+    step7: { x: 685, y: R4[0], type: 'task', actor: 'X', label: '7. Abrir aba "Simulador de Renda"\nDigitar valor do aporte (ex: R$ 100, R$ 500)',
+      tip: 'Acesse a 3ª aba e informe quanto você planeja investir hoje para calcular o número exato de ações.' },
+    step8: { x: 685, y: R4[1], type: 'task', actor: 'X', label: '8. Ver total de ações a comprar e renda anual/mensal projetada',
+      tip: 'O simulador mostra quantas ações seu dinheiro compra e calcula a renda passiva em dinheiro que cairá na sua conta.' },
+    step9: { x: 935, y: R4[2], type: 'task', actor: 'C', label: '9. Abrir o app da Corretora e Comprar fracionário (ex: CMIG4F)',
+      tip: 'Abra seu Home Broker (Inter, NuInvest, Rico, XP, etc.) e envie a ordem no mercado fracionário adicionando F ao ticker.' },
+    end: { x: 935, y: R4[3], type: 'end', actor: 'C', label: 'Ações Compradas!\n(Dividendos pingando na conta)',
+      tip: 'Parabéns! Você se tornou sócio de uma grande empresa. Agora é só aguardar os dividendos caírem para reinvestir!' },
+    throwA: { x: 935, y: R4[4], type: 'link', dir: 'throw', letter: 'A', actor: 'C', label: 'Reinvestir proventos (Bola de Neve)',
+      tip: 'Conector A: fecha o ciclo. Quando os dividendos caírem na conta, junte com o novo salário e compre mais ações!' }
   };
 
-  // ---------- CONEXÕES (EDGES) ----------
+  // ---------- CONEXÕES (FLUXO EXATO) ----------
   var edges = [
-    // Etapa 1
-    { from: 'start', to: 'openApp' },
-    { from: 'catchA', to: 'openApp' },
-    { from: 'openApp', to: 'fetchData' },
-    { from: 'marketFeed', to: 'fetchData', dashed: true, label: 'Feed B3' },
-    { from: 'fetchData', to: 'showMetrics' },
-    { from: 'showMetrics', to: 'filterSector' },
-    { from: 'filterSector', to: 'gwReserva' },
-    { from: 'gwReserva', to: 'saveReserva', label: 'Sem reserva',
-      points: [[185, R1[5]], [185, R1[5] + 34], [935, R1[5] + 34], [935, R1[5]]],
-      labelAt: [560, R1[5] + 34] },
-    { from: 'gwReserva', to: 'rankScreen', label: 'Reserva OK' },
-    { from: 'rankScreen', to: 'connEtapa2' },
+    // Fase 1
+    { from: 'start', to: 'step1' },
+    { from: 'catchA', to: 'start' },
+    { from: 'step1', to: 'step2' },
+    { from: 'step2', to: 'step3' },
+    { from: 'step3', to: 'chooseCandidate' },
+    { from: 'chooseCandidate', to: 'gwBazin' },
 
-    // Etapa 2
-    { from: 'connEtapa2', to: 'checkBazin' },
-    { from: 'checkBazin', to: 'discardB', label: 'Não (Cara)',
-      points: [[185, R2[0]], [185, R2[0] + 34], [95, R2[0] + 34], [95, R2[1]]],
-      labelAt: [135, R2[0] + 34] },
-    { from: 'discardB', to: 'catchB' },
-    { from: 'checkBazin', to: 'checkGraham', label: 'Sim (Barata)' },
-    { from: 'checkGraham', to: 'calcMagic' },
-    { from: 'calcMagic', to: 'checkROE' },
-    { from: 'checkROE', to: 'checkDebt', label: 'Sim' },
-    { from: 'checkROE', to: 'discardB', label: 'Não (Baixa Qualidade)', dashed: true,
-      points: [[185, R2[4]], [38, R2[4]], [38, R2[1]], [95, R2[1]]],
-      labelAt: [60, R2[3]] },
-    { from: 'checkDebt', to: 'pickWinner' },
-    { from: 'pickWinner', to: 'flagDiag' },
-    { from: 'flagDiag', to: 'goToRaioX' },
+    // Portão Bazin
+    { from: 'gwBazin', to: 'discardBazin', label: 'NÃO (Está Cara)' },
+    { from: 'discardBazin', to: 'step2', label: 'Escolher outra', dashed: true,
+      points: [[185, R2[1]], [60, R2[1]], [60, R1[2]], [185, R1[2]]],
+      labelAt: [90, (R2[1] + R1[2]) / 2] },
+    { from: 'gwBazin', to: 'bazinApproved', label: 'SIM (Está Atrativa)' },
+    { from: 'bazinApproved', to: 'step4' },
 
-    // Etapa 3
-    { from: 'goToRaioX', to: 'loadCandle' },
-    { from: 'loadCandle', to: 'checkTiming' },
-    { from: 'checkTiming', to: 'waitPullback', label: 'Sim (Euforia)' },
-    { from: 'checkTiming', to: 'openSim', label: 'Não (Normal)' },
-    { from: 'waitPullback', to: 'openSim' },
-    { from: 'openSim', to: 'simCalc' },
-    { from: 'simCalc', to: 'openBroker' },
-    { from: 'openBroker', to: 'sendOrder' },
-    { from: 'sendOrder', to: 'execTrade' },
-    { from: 'execTrade', to: 'orderDone' },
+    // Fase 2
+    { from: 'step4', to: 'step5' },
+    { from: 'step5', to: 'step6' },
+    { from: 'step6', to: 'gwTiming' },
+    { from: 'gwTiming', to: 'waitPullback', label: 'SIM (Subiu muito rápido)' },
+    { from: 'gwTiming', to: 'timingOK', label: 'NÃO (Preço Saudável)' },
+    { from: 'waitPullback', to: 'step7' },
+    { from: 'timingOK', to: 'step7' },
 
-    // Etapa 4
-    { from: 'orderDone', to: 'waitDivs', dashed: true,
-      points: [[935, R3[8]], [935, R3[8] + 45], [685, R3[8] + 45], [685, R4[0]]],
-      labelAt: [810, R3[8] + 45] },
-    { from: 'waitDivs', to: 'dateCom' },
-    { from: 'dateCom', to: 'payDivs' },
-    { from: 'payDivs', to: 'divNotice' },
-    { from: 'divNotice', to: 'reinvestGw' },
-    { from: 'reinvestGw', to: 'snowball', label: 'Sim (Multiplicar)' },
-    { from: 'reinvestGw', to: 'orderDone', label: 'Não (Sacar/Gastar)', dashed: true,
-      points: [[185, R4[4]], [38, R4[4]], [38, R4[6] + 40], [935, R4[6] + 40], [935, R4[6]]],
-      labelAt: [480, R4[6] + 40] },
-    { from: 'snowball', to: 'throwA' }
+    // Fase 3
+    { from: 'step7', to: 'step8' },
+    { from: 'step8', to: 'step9' },
+    { from: 'step9', to: 'end' },
+    { from: 'end', to: 'throwA' }
   ];
 
   // ---------- MONTAGEM DO SVG ----------
@@ -355,16 +294,15 @@
   svg.appendChild(el('rect', { x: 0, y: TITLE_H, width: WIDTH, height: HEIGHT - TITLE_H, fill: '#ffffff' }));
   headerSvg.appendChild(el('rect', { x: 0, y: 0, width: WIDTH, height: TITLE_H, fill: '#ffffff' }));
 
-  headerSvg.appendChild(el('text', { x: WIDTH / 2, y: 32, 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 800, fill: '#0f172a' }, ['Processo BPMN Vertical - Radar Investimentos B3']));
+  headerSvg.appendChild(el('text', { x: WIDTH / 2, y: 32, 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 800, fill: '#0f172a' }, ['Processo de Decisão do Investidor - Radar Investimentos B3']));
   headerSvg.appendChild(el('text', { x: WIDTH / 2, y: 53, 'text-anchor': 'middle', 'font-size': 12.5, fill: '#475569' }, ['Fluxo ponta a ponta do Investidor Inteligente — passe o mouse sobre cada elemento para ver a explicação']));
 
   // Legenda Centralizada
   var legendItems = [
     { shape: 'circle-thin', label: 'Início do Aporte' },
-    { shape: 'circle-thick', label: 'Fim / Conclusão' },
-    { shape: 'rect', label: 'Atividade / Tarefa' },
+    { shape: 'circle-thick', label: 'Fim (Ações Compradas)' },
+    { shape: 'rect', label: 'Atividade / Passo' },
     { shape: 'diamond', label: 'Portão de Decisão' },
-    { shape: 'timer', label: 'Data dos Dividendos' },
     { shape: 'link', label: 'Conector (Bola de Neve)' }
   ];
   var lfont = '11.5px Segoe UI, Arial, sans-serif';
@@ -380,9 +318,6 @@
       headerSvg.appendChild(el('rect', { x: lx, y: gy - 8, width: 16, height: 16, rx: 4, fill: '#eff6ff', stroke: '#2563eb', 'stroke-width': 2 }));
     } else if (it.shape === 'diamond') {
       headerSvg.appendChild(el('rect', { x: lx, y: gy - 8, width: 16, height: 16, fill: '#fef3c7', stroke: '#d97706', 'stroke-width': 2, transform: 'rotate(45 ' + (lx + 8) + ' ' + gy + ')' }));
-    } else if (it.shape === 'timer') {
-      headerSvg.appendChild(el('circle', { cx: lx + 8, cy: gy, r: 8, fill: '#fff', stroke: '#ea580c', 'stroke-width': 2 }));
-      headerSvg.appendChild(el('path', { d: 'M' + (lx + 8) + ',' + (gy - 4) + ' L' + (lx + 8) + ',' + gy + ' L' + (lx + 11.5) + ',' + (gy + 2), fill: 'none', stroke: '#ea580c', 'stroke-width': 1.6, 'stroke-linecap': 'round' }));
     } else {
       headerSvg.appendChild(el('circle', { cx: lx + 8, cy: gy, r: 8, fill: '#fff', stroke: '#475569', 'stroke-width': 1.6 }));
       headerSvg.appendChild(el('circle', { cx: lx + 8, cy: gy, r: 5.4, fill: '#fff', stroke: '#475569', 'stroke-width': 1.4 }));
@@ -406,7 +341,7 @@
     svg.appendChild(el('line', { x1: col.x - COLW / 2, y1: bandTop, x2: col.x - COLW / 2, y2: bandBottom, stroke: '#e2e8f0', 'stroke-width': 1 }));
   });
 
-  // Barras Escuras das Etapas
+  // Barras Escuras das Fases
   [S.s1, S.s2, S.s3, S.s4].forEach(function (sec) {
     svg.appendChild(el('rect', { x: 0, y: sec.headerY, width: WIDTH, height: HEADER_H, fill: '#0f172a' }));
     var ty = sec.headerY + HEADER_H / 2 + 5;
@@ -441,7 +376,7 @@
   // ---------- NÓS (DESENHO E TOOLTIPS) ----------
   var tooltip = document.getElementById('tooltip');
   function attachTip(group, n) {
-    group.addEventListener('mouseenter', function (e) { showTip(e, n.label, n.tip); highlight(group, true); });
+    group.addEventListener('mouseenter', function (e) { showTip(e, n.label.replace(/\n/g, ' '), n.tip); highlight(group, true); });
     group.addEventListener('mousemove', positionTip);
     group.addEventListener('mouseleave', function () { hideTip(); highlight(group, false); });
   }
@@ -450,7 +385,8 @@
     if (shape) shape.setAttribute('stroke-width', on ? 3.5 : 2);
   }
   function sideLabel(g, n, offsetX, font, fontSize) {
-    var lines = wrapLines(n.label, font, 170);
+    var rawText = n.label.replace(/\n/g, ' ');
+    var lines = wrapLines(rawText, font, 175);
     var w = Math.max.apply(null, lines.map(function (l) { return textWidth(l, font); })) + 16;
     var x0 = n.x + offsetX;
     var y0 = n.y - (lines.length * 15) / 2 + 10;
@@ -466,32 +402,32 @@
     var g = el('g', { class: 'node' }, []);
 
     if (n.type === 'task') {
-      var w = 210, h = 74;
+      var w = 215, h = 76;
       g.appendChild(el('rect', { class: 'shape', x: n.x - w / 2, y: n.y - h / 2, width: w, height: h, rx: 13, ry: 13, fill: c.fill, stroke: c.stroke, 'stroke-width': 2 }));
-      var lines = wrapLines(n.label, '700 12.5px Segoe UI, Arial, sans-serif', w - 20);
-      var lh = 15.5;
+      var lines = [];
+      n.label.split('\n').forEach(function(segment) {
+        wrapLines(segment, '700 12px Segoe UI, Arial, sans-serif', w - 18).forEach(function(l) { lines.push(l); });
+      });
+      var lh = 15;
       var startY = n.y - ((lines.length - 1) * lh) / 2 + 4;
       lines.forEach(function (line, i) {
-        g.appendChild(el('text', { x: n.x, y: startY + i * lh, 'text-anchor': 'middle', 'font-size': 12.5, 'font-weight': 700, fill: '#0f172a' }, [line]));
+        g.appendChild(el('text', { x: n.x, y: startY + i * lh, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, fill: '#0f172a' }, [line]));
       });
     } else if (n.type === 'gateway') {
       var s = 62;
       g.appendChild(el('rect', { class: 'shape', x: n.x - s / 2, y: n.y - s / 2, width: s, height: s, fill: '#fef3c7', stroke: '#d97706', 'stroke-width': 2.3, transform: 'rotate(45 ' + n.x + ' ' + n.y + ')' }));
-      g.appendChild(el('text', { x: n.x, y: n.y + 7, 'text-anchor': 'middle', 'font-size': 21, 'font-weight': 800, fill: '#b45309' }, ['?']));
+      g.appendChild(el('text', { x: n.x, y: n.y + 7, 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 800, fill: '#b45309' }, ['?']));
       sideLabel(g, n, s / 2 + 16, '700 12px Segoe UI, Arial, sans-serif', 12);
-    } else if (n.type === 'start' || n.type === 'end' || n.type === 'timer') {
+    } else if (n.type === 'start' || n.type === 'end') {
       var r = 27;
-      var col = n.type === 'end' ? '#b91c1c' : (n.type === 'timer' ? '#ea580c' : '#16a34a');
+      var col = n.type === 'end' ? '#b91c1c' : '#16a34a';
       g.appendChild(el('circle', { class: 'shape', cx: n.x, cy: n.y, r: r, fill: '#ffffff', stroke: col, 'stroke-width': n.type === 'end' ? 4 : 2.5 }));
       if (n.type === 'start') {
         g.appendChild(el('polygon', { points: (n.x - 6) + ',' + (n.y - 9) + ' ' + (n.x - 6) + ',' + (n.y + 9) + ' ' + (n.x + 9) + ',' + n.y, fill: '#16a34a' }));
-      } else if (n.type === 'end') {
-        g.appendChild(el('rect', { x: n.x - 8, y: n.y - 8, width: 16, height: 16, rx: 2, fill: '#b91c1c' }));
       } else {
-        g.appendChild(el('circle', { cx: n.x, cy: n.y, r: 13, fill: 'none', stroke: col, 'stroke-width': 1.8 }));
-        g.appendChild(el('path', { d: 'M' + n.x + ',' + (n.y - 7) + ' L' + n.x + ',' + n.y + ' L' + (n.x + 6) + ',' + (n.y + 4), fill: 'none', stroke: col, 'stroke-width': 1.8, 'stroke-linecap': 'round' }));
+        g.appendChild(el('rect', { x: n.x - 8, y: n.y - 8, width: 16, height: 16, rx: 2, fill: '#b91c1c' }));
       }
-      sideLabel(g, n, r + 16, '700 12.5px Segoe UI, Arial, sans-serif', 12.5);
+      sideLabel(g, n, r + 16, '700 12px Segoe UI, Arial, sans-serif', 12);
     } else if (n.type === 'link') {
       var ro = 25;
       g.appendChild(el('circle', { class: 'shape', cx: n.x, cy: n.y, r: ro, fill: '#ffffff', stroke: '#475569', 'stroke-width': 2 }));
@@ -534,7 +470,7 @@
   var btnWheelToggle = document.getElementById('btnWheelToggle');
   var scrollWrap = document.getElementById('scrollWrap');
 
-  var wheelZoomDirect = true; // Permite zoom direto com a rodinha do mouse
+  var wheelZoomDirect = true;
 
   function applyZoom() {
     var pct = parseInt(zoomRange.value, 10);
@@ -547,7 +483,6 @@
   zoomRange.addEventListener('input', applyZoom);
   applyZoom();
 
-  // Botões de Zoom + e -
   btnMinus.addEventListener('click', function () {
     var cur = parseInt(zoomRange.value, 10);
     var next = Math.max(30, cur - 10);
@@ -574,17 +509,14 @@
     scrollWrap.scrollLeft = 0;
   });
 
-  // Alternador da Rodinha do Mouse
   btnWheelToggle.addEventListener('click', function () {
     wheelZoomDirect = !wheelZoomDirect;
     if (wheelZoomDirect) {
       btnWheelToggle.classList.add('active');
       btnWheelToggle.textContent = '🖱️ Rodinha: Zoom Direto';
-      btnWheelToggle.title = 'A rodinha do mouse amplia ou reduz o zoom diretamente';
     } else {
       btnWheelToggle.classList.remove('active');
       btnWheelToggle.textContent = '📜 Rodinha: Rolar Página';
-      btnWheelToggle.title = 'A rodinha do mouse rola a página (segure Ctrl para dar zoom)';
     }
   });
 
@@ -602,7 +534,7 @@
     }
   }, { passive: false });
 
-  // 2. Duplo Clique para Zoom In / Shift + Duplo Clique para Zoom Out
+  // 2. Duplo Clique para Zoom
   scrollWrap.addEventListener('dblclick', function (e) {
     var cur = parseInt(zoomRange.value, 10);
     var next = e.shiftKey ? Math.max(30, cur - 20) : Math.min(200, cur + 20);
@@ -613,7 +545,7 @@
   // 3. Arrastar e Soltar (Pan com o mouse para navegar)
   var isMouseDown = false, startMouseX, startMouseY, startScrollLeft, startScrollTop;
   scrollWrap.addEventListener('mousedown', function (e) {
-    if (e.target.closest('.node')) return; // Permite tooltip ao clicar nos nós
+    if (e.target.closest('.node')) return;
     isMouseDown = true;
     scrollWrap.classList.add('grabbing');
     startMouseX = e.pageX - scrollWrap.offsetLeft;
@@ -665,7 +597,7 @@
       canvas.toBlob(function (blob) {
         var a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'processo-bpmn-vertical-radar-investimentos-b3.png';
+        a.download = 'processo-bpmn-decisao-investidor-radar-b3.png';
         document.body.appendChild(a);
         a.click();
         a.remove();
