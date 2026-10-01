@@ -82,6 +82,7 @@ st.markdown("""
         cursor: help;
         border-bottom: 1px dotted #388BFD;
         padding-bottom: 2px;
+        touch-action: manipulation;
     }
     .tooltip-label:hover {
         color: #58A6FF;
@@ -95,6 +96,7 @@ st.markdown("""
         padding: 2px 6px;
         border-radius: 4px;
         font-weight: 500;
+        white-space: nowrap;
     }
 
     .podio-header {
@@ -116,6 +118,197 @@ st.markdown("""
         color: #C9D1D9;
         margin-bottom: 16px;
         cursor: help;
+    }
+
+    /* ================= RESPONSIVIDADE (MOBILE & TABLET) ================= */
+
+    /* Touch targets e acessibilidade mobile */
+    button, input, select, [role="button"], [data-baseweb="tab"] {
+        touch-action: manipulation;
+    }
+
+    /* Botão de toggle da barra lateral sempre acessível no mobile */
+    [data-testid="collapsedControl"],
+    [data-testid="stSidebarCollapseButton"] {
+        display: flex !important;
+        visibility: visible !important;
+        z-index: 999999 !important;
+    }
+
+    /* Container de carregamento central responsivo */
+    .loading-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px 24px;
+        text-align: center;
+        background: #161B22;
+        border: 1px solid #30363D;
+        border-radius: 16px;
+        margin: 40px auto;
+        max-width: 660px;
+        box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    }
+
+    /* Scroll horizontal suave em tabelas no celular */
+    [data-testid="stDataFrame"] {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* Abas com rolagem horizontal suave no celular/tablet */
+    [data-testid="stTabs"] [data-baseweb="tab-list"] {
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: thin;
+        gap: 4px;
+        padding-bottom: 4px !important;
+    }
+    button[data-baseweb="tab"] {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* -------- TABLET (Largura 769px a 1024px) -------- */
+    @media (max-width: 1024px) {
+        .block-container {
+            padding-left: 1.2rem !important;
+            padding-right: 1.2rem !important;
+            padding-top: 1.5rem !important;
+            padding-bottom: 2rem !important;
+        }
+
+        /* Envolver colunas quando houver muitas */
+        [data-testid="stHorizontalBlock"] {
+            flex-wrap: wrap !important;
+            gap: 12px !important;
+        }
+
+        /* Colunas de métricas no tablet: 3 por linha */
+        [data-testid="column"]:has([data-testid="stMetric"]),
+        [data-testid="stColumn"]:has([data-testid="stMetric"]) {
+            flex: 1 1 calc(33.333% - 12px) !important;
+            min-width: calc(33.333% - 12px) !important;
+        }
+
+        /* Podio e rankings no tablet: fluidos */
+        [data-testid="column"]:has([data-testid="stDataFrame"]),
+        [data-testid="stColumn"]:has([data-testid="stDataFrame"]) {
+            flex: 1 1 calc(50% - 12px) !important;
+            min-width: calc(50% - 12px) !important;
+        }
+    }
+
+    /* -------- CELULAR / SMARTPHONE (Largura até 768px) -------- */
+    @media (max-width: 768px) {
+        .block-container {
+            padding-left: 0.65rem !important;
+            padding-right: 0.65rem !important;
+            padding-top: 1rem !important;
+            padding-bottom: 1.5rem !important;
+        }
+
+        /* Títulos fluidos */
+        h1, [data-testid="stHeadingWithActionElements"] h1 {
+            font-size: 1.55rem !important;
+            line-height: 1.25 !important;
+        }
+        h2 {
+            font-size: 1.3rem !important;
+        }
+        h3 {
+            font-size: 1.15rem !important;
+        }
+        h4 {
+            font-size: 1.05rem !important;
+        }
+
+        /* Card de carregamento no celular */
+        .loading-card {
+            padding: 30px 16px !important;
+            margin: 20px 8px !important;
+            max-width: 96% !important;
+        }
+        .loading-card h2 {
+            font-size: 20px !important;
+        }
+        .loading-card p {
+            font-size: 13.5px !important;
+        }
+
+        /* Layout em colunas vira flex-wrap */
+        [data-testid="stHorizontalBlock"] {
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+        }
+
+        /* No celular: colunas com métricas ficam 2 por linha (estilo grid moderno de app) */
+        [data-testid="column"]:has([data-testid="stMetric"]),
+        [data-testid="stColumn"]:has([data-testid="stMetric"]) {
+            flex: 1 1 calc(50% - 8px) !important;
+            min-width: calc(50% - 8px) !important;
+        }
+
+        /* No celular: colunas com tabelas (Podio Bazin, Graham, Greenblatt) ganham 100% de largura */
+        [data-testid="column"]:has([data-testid="stDataFrame"]),
+        [data-testid="stColumn"]:has([data-testid="stDataFrame"]) {
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+            margin-bottom: 16px !important;
+        }
+
+        /* No celular: colunas com inputs/seletores ganham 100% de largura */
+        [data-testid="column"]:has(input),
+        [data-testid="stColumn"]:has(input),
+        [data-testid="column"]:has(.stSlider),
+        [data-testid="stColumn"]:has(.stSlider),
+        [data-testid="column"]:has(.stSelectbox),
+        [data-testid="stColumn"]:has(.stSelectbox) {
+            flex: 1 1 100% !important;
+            min-width: 100% !important;
+        }
+
+        /* Ajuste de valores de métricas para não estourarem no celular */
+        [data-testid="stMetricValue"] {
+            font-size: clamp(1.1rem, 3.8vw, 1.45rem) !important;
+            white-space: nowrap !important;
+        }
+        [data-testid="stMetricLabel"] {
+            font-size: 0.78rem !important;
+        }
+        [data-testid="stMetricDelta"] {
+            font-size: 0.72rem !important;
+        }
+
+        /* Cartões de métrica */
+        .metric-card {
+            padding: 12px 10px !important;
+        }
+
+        /* Tooltips e badges flexíveis no mobile */
+        .tooltip-label {
+            font-size: 12.5px !important;
+            flex-wrap: wrap;
+        }
+        .badge-help {
+            font-size: 10px !important;
+            padding: 2px 5px !important;
+        }
+
+        /* Gráfico Plotly responsivo no celular */
+        .js-plotly-plot, .plot-container {
+            height: 380px !important;
+        }
+
+        /* Banners de abas */
+        .tab-banner {
+            font-size: 12.5px !important;
+            padding: 10px 12px !important;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -159,23 +352,10 @@ st.sidebar.caption("Investimentos Inteligentes na Bolsa")
 # ----------------- MENSAGEM DE ABERTURA NO CENTRO DA TELA -----------------
 loading_placeholder = st.empty()
 loading_placeholder.markdown("""
-<div style="
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 30px;
-    text-align: center;
-    background: #161B22;
-    border: 1px solid #30363D;
-    border-radius: 16px;
-    margin: 40px auto;
-    max-width: 660px;
-    box-shadow: 0 16px 40px rgba(0,0,0,0.5);
-">
+<div class="loading-card">
     <div style="font-size: 52px; margin-bottom: 14px;">🏃‍♂️ 🏃‍♀️ 📈 ⏳</div>
-    <h2 style="color: #58A6FF; margin: 0 0 12px 0; font-size: 25px; font-weight: 700;">Aguarde, atualizando dados da B3...</h2>
-    <p style="color: #8B949E; font-size: 14.5px; line-height: 1.5; margin: 0; max-width: 520px;">
+    <h2 style="color: #58A6FF; margin: 0 0 12px 0; font-weight: 700;">Aguarde, atualizando dados da B3...</h2>
+    <p style="color: #8B949E; line-height: 1.5; margin: 0; max-width: 520px;">
         Sincronizando cotações em tempo real, proventos recentes e recalculando os preços-teto de <strong>Décio Bazin</strong> e <strong>Benjamin Graham</strong>.
     </p>
     <div style="margin-top: 22px; color: #3FB950; font-size: 13.5px; font-weight: 600;">
@@ -601,11 +781,18 @@ with tab_raiox:
                 ))
 
             fig.update_layout(
-                height=460,
+                height=450,
                 template="plotly_dark",
                 xaxis_rangeslider_visible=False,
-                margin=dict(l=20, r=20, t=30, b=20),
-                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                margin=dict(l=10, r=10, t=25, b=45),
+                legend=dict(
+                    orientation="h",
+                    yanchor="top",
+                    y=-0.16,
+                    xanchor="center",
+                    x=0.5,
+                    font=dict(size=10.5)
+                )
             )
             st.plotly_chart(fig, use_container_width=True)
 
@@ -814,13 +1001,13 @@ with tab_guia:
 
 # Rodapé Oficial com Autoria
 st.markdown("---")
-col_foot1, col_foot2 = st.columns([3, 2])
-with col_foot1:
-    st.caption("Desenvolvido para análise quantitativa e fundamentalista de ações da B3. Não representa recomendação direta de compra ou venda.")
-with col_foot2:
-    st.markdown(
-        "<div style='text-align: right; color: #8B949E; font-size: 13px; padding-top: 5px;'>"
-        "Desenvolvido por: <strong style='color: #58A6FF;'>Henrique Rosa / Antigravity - V1.0 - 2026</strong>"
-        "</div>",
-        unsafe_allow_html=True
-    )
+st.markdown("""
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0;">
+    <div style="color: #8B949E; font-size: 12.5px; flex: 1 1 320px;">
+        Desenvolvido para análise quantitativa e fundamentalista de ações da B3. Não representa recomendação direta de compra ou venda.
+    </div>
+    <div style="color: #8B949E; font-size: 13px; text-align: right; flex: 1 1 260px;">
+        Desenvolvido por: <strong style="color: #58A6FF;">Henrique Rosa / Antigravity - V1.0 - 2026</strong>
+    </div>
+</div>
+""", unsafe_allow_html=True)
